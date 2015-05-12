@@ -88,19 +88,19 @@ $(document).ready(function() {
                 if(col < 0){
                     return true;
                 }
-                var instance = this,
-                    menu = buildMenu(columns[col].type),
-                    button = buildButton();
+                //var instance = this,
+                //    menu = buildMenu(columns[col].type),
+                //    button = buildButton();
 
-                addButtonMenuEvent(button, menu);
+                //addButtonMenuEvent(button, menu);
 
-                Handsontable.Dom.addEvent(menu, 'click', function (event) {
-                    if (event.target.nodeName == 'LI') {
-                        setColumnType(col, event.target.data['colType'], instance);
-                    }
-                });
-                TH.firstChild.appendChild(button);
-                TH.style['white-space'] = 'normal';
+                //Handsontable.Dom.addEvent(menu, 'click', function (event) {
+                //    if (event.target.nodeName == 'LI') {
+                //        setColumnType(col, event.target.data['colType'], instance);
+                //    }
+                //});
+                //TH.firstChild.appendChild(button);
+                //TH.style['white-space'] = 'normal';
             },
             cells: function (row, col, prop) {
                 var cellProperties;
