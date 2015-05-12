@@ -10,14 +10,14 @@
   <div class="col-md-2">
     <p>
       Based on the resource type <%= @import.resource_type %>, here are the fields:
-      <ul>
-        <% @import.fields_for_csv[:required].each do |field| %>
-        <li><%= field.keys.first %>:<%= field.values.first %> *</li>
-        <% end %>
-        <% @import.fields_for_csv[:suggested].each do |field| %>
-        <li><%= field.keys.first %>:<%= field.values.first %> </li>
-        <% end %>
-      </ul>
+    <ul>
+      <% @import.fields_for_csv[:required].each do |field| %>
+          <li><%= field.keys.first %>:<%= field.values.first %> *</li>
+      <% end %>
+      <% @import.fields_for_csv[:suggested].each do |field| %>
+          <li><%= field.keys.first %>:<%= field.values.first %> </li>
+      <% end %>
+    </ul>
     <span>* is required.</span>
     </p>
     <hr>
@@ -33,11 +33,20 @@
     </script>
   </div>
   <div class="col-md-10">
+
     <div id="drop_zone" class="panel panel-success text-center" style="height: 100px;font-size: 24px;padding-top: 35px;">Drop files here</div>
     <output id="list"></output>
+    <p>
+      <span>Fields to Map:</span>
+      <% @import.fields_for_csv[:suggested].each do |field| %>
+        <div class="label label-warning field-label <%= field.keys.first %>" style="padding: 5px;"><i class='fa fa-square-o'></i> <%= field.keys.first %></div>
+    <% end %>
+    </p>
+
     <div id="hot" style="overflow: scroll; height: 500px; width: 100%;" class="handsontable"></div>
   </div>
 </div>
 
+<div class="fields-list" data-required-fields="<%= @import.fields_for_csv[:required].map {|i| i.keys.first} %>" data-suggested-fields="<%= @import.fields_for_csv[:suggested].map {|i| i.keys.first.to_s} %>"></div>
 
 

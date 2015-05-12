@@ -58,6 +58,7 @@ $(document).ready(function() {
 
     var _onsheet = function(json, cols, sheetnames, select_sheet_cb) {
         $('#footnote').hide();
+        $(_target).hide();
 
         make_buttons(sheetnames, select_sheet_cb);
         calculateSize();
@@ -112,8 +113,28 @@ $(document).ready(function() {
 
                     return cellProperties;
                 }
-            }
+            },
+            afterChange: function(changes, source) {
+               console.log("just changed" +changes);
+                if(Array.isArray(changes) === true && changes[0][0] == 0){
+                    console.log("in header row");
+                    var theLabel = $(".field-label." + changes[0][3]);
+                    if(theLabel){
+                        console.log("trying to change the class");
+                        theLabel.addClass("label-success");
+                        theLabel.removeClass("label-warning");
+                        $(theLabel.children()[0]).addClass("fa-check-square-o");
+                        $(theLabel.children()[0]).removeClass("fa-square-o");
+                    }
+                    else{
+                        console.log("not found");
+                    }
+                }
+
+              }
         });
+
+
     };
 
     function addButtonMenuEvent(button, menu) {
