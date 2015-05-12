@@ -15,7 +15,7 @@
 <body>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
-  <div class="container">
+  <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
         <span class="sr-only">Toggle navigation</span>
@@ -34,8 +34,10 @@
   </div>
 </nav>
 
-<div class="container" style="margin-top: 40px;">
-
+<div class="container-fluid" style="margin-top: 60px;">
+  <% if notice.present? %>
+      <p id="notice" class="alert alert-info"><%= notice %></p>
+  <% end %>
   <%= yield %>
 
 </div><!-- /.container -->

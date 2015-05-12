@@ -1,34 +1,43 @@
-<p id="notice"><%= notice %></p>
+
+<h1>Start Importing!</h1>
 
 <p>
-  <strong>Api key:</strong>
-  <%= @import.api_key %>
+  You can check the progress at any time by visiting this URL: <code><%= import_url(@import.uuid) %></code>
 </p>
 
-<p>
-  <strong>Resource type:</strong>
-  <%= @import.resource_type %>
-</p>
 
-<p>
-  <strong>Mapping:</strong>
-  <%= @import.mapping %>
-</p>
+<div class="row">
+  <div class="col-md-2">
+    <p>
+      Based on the resource type <%= @import.resource_type %>, here are the fields:
+      <ul>
+        <% @import.fields_for_csv[:required].each do |field| %>
+        <li><%= field.keys.first %>:<%= field.values.first %> *</li>
+        <% end %>
+        <% @import.fields_for_csv[:suggested].each do |field| %>
+        <li><%= field.keys.first %>:<%= field.values.first %> </li>
+        <% end %>
+      </ul>
+    <span>* is required.</span>
+    </p>
+    <hr>
+    <%= simple_form_for @import, url: import_path(@import.uuid) do |f| %>
+        <%= f.input :resource_type, as: :select, collection: Import::RESOURCE_COLLECTION %>
+    <% end %>
+    <script>
+        $(function() {
+            $('#import_resource_type').change(function() {
+                this.form.submit();
+            });
+        });
+    </script>
+  </div>
+  <div class="col-md-10">
+    <div id="drop_zone" class="panel panel-success text-center" style="height: 100px;font-size: 24px;padding-top: 35px;">Drop files here</div>
+    <output id="list"></output>
+    <div id="hot" style="overflow: scroll; height: 500px; width: 100%;" class="handsontable"></div>
+  </div>
+</div>
 
-<p>
-  <strong>Record count:</strong>
-  <%= @import.record_count %>
-</p>
 
-<p>
-  <strong>Success count:</strong>
-  <%= @import.success_count %>
-</p>
 
-<p>
-  <strong>Error count:</strong>
-  <%= @import.error_count %>
-</p>
-
-<%= link_to 'Edit', edit_import_path(@import) %> |
-<%= link_to 'Back', imports_path %>
