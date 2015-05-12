@@ -19,7 +19,8 @@ class ImportsController < ApplicationController
 
   # GET /imports/new
   def new
-    @import = Import.new
+    @import = Import.create
+    redirect_to import_path(@import.uuid)
   end
 
   # GET /imports/1/edit
@@ -47,7 +48,7 @@ class ImportsController < ApplicationController
   def update
     respond_to do |format|
       if @import.update(import_params)
-        format.html { redirect_to @import, notice: 'Import was successfully updated.' }
+        format.html { redirect_to import_path(@import.uuid), notice: 'Import was successfully updated.' }
         format.json { render :show, status: :ok, location: @import }
       else
         format.html { render :edit }
@@ -69,7 +70,7 @@ class ImportsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_import
-      @import = Import.find(params[:id])
+      @import = Import.find_by(uuid: params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

@@ -58,6 +58,7 @@ $(document).ready(function() {
 
     var _onsheet = function(json, cols, sheetnames, select_sheet_cb) {
         $('#footnote').hide();
+        $(_target).hide();
 
         make_buttons(sheetnames, select_sheet_cb);
         calculateSize();
@@ -67,6 +68,8 @@ $(document).ready(function() {
         json.unshift(function(head){var o = {}; for(i=0;i!=head.length;++i) o[head[i]] = head[i]; return o;}(cols));
         calculateSize();
         /* showtime! */
+        var columns = cols.map(function(x) { return {data:x, type: 'text'}; });
+
         $("#hot").handsontable({
             data: json,
             startRows: 5,
@@ -74,16 +77,142 @@ $(document).ready(function() {
             fixedRowsTop: 1,
             stretchH: 'all',
             rowHeaders: true,
-            columns: cols.map(function(x) { return {data:x}; }),
+            columns: columns,
             colHeaders: cols.map(function(x,i) { return XLS.utils.encode_col(i); }),
             cells: function (r,c,p) {
                 if(r === 0) this.renderer = boldRenderer;
             },
             width: function () { return availableWidth; },
             height: function () { return availableHeight; },
-            stretchH: 'all'
+            stretchH: 'all',
+            afterGetColHeader: function (col, TH) {
+                if(col < 0){
+                    return true;
+                }
+                //var instance = this,
+                //    menu = buildMenu(columns[col].type),
+                //    button = buildButton();
+
+                //addButtonMenuEvent(button, menu);
+
+                //Handsontable.Dom.addEvent(menu, 'click', function (event) {
+                //    if (event.target.nodeName == 'LI') {
+                //        setColumnType(col, event.target.data['colType'], instance);
+                //    }
+                //});
+                //TH.firstChild.appendChild(button);
+                //TH.style['white-space'] = 'normal';
+            },
+            cells: function (row, col, prop) {
+                var cellProperties;
+
+                if (row === 0) {
+                    cellProperties = {
+                        type: 'text' // force text type for first row
+                    };
+
+                    return cellProperties;
+                }
+            },
+            afterChange: function(changes, source) {
+               console.log("just changed" +changes);
+                if(Array.isArray(changes) === true && changes[0][0] == 0){
+                    console.log("in header row");
+                    var theLabel = $(".field-label." + changes[0][3]);
+                    if(theLabel){
+                        console.log("trying to change the class");
+                        theLabel.addClass("label-success");
+                        theLabel.removeClass("label-warning");
+                        $(theLabel.children()[0]).addClass("fa-check-square-o");
+                        $(theLabel.children()[0]).removeClass("fa-square-o");
+                    }
+                    else{
+                        console.log("not found");
+                    }
+                }
+
+              }
         });
+
+
     };
+
+    function addButtonMenuEvent(button, menu) {
+        Handsontable.Dom.addEvent(button, 'click', function (event) {
+            var changeTypeMenu, position, removeMenu;
+
+            document.body.appendChild(menu);
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            changeTypeMenu = document.querySelectorAll('.changeTypeMenu');
+
+            for (var i = 0, len = changeTypeMenu.length; i < len; i++) {
+                changeTypeMenu[i].style.display = 'none';
+            }
+            menu.style.display = 'block';
+            position = button.getBoundingClientRect();
+
+            menu.style.top = (position.top + (window.scrollY || window.pageYOffset)) + 2 + 'px';
+            menu.style.left = (position.left) + 'px';
+
+            removeMenu = function (event) {
+                if (event.target.nodeName == 'LI' && event.target.parentNode.className.indexOf('changeTypeMenu') !== -1) {
+                    if (menu.parentNode) {
+                        menu.parentNode.removeChild(menu);
+                    }
+                }
+            };
+            Handsontable.Dom.removeEvent(document, 'click', removeMenu);
+            Handsontable.Dom.addEvent(document, 'click', removeMenu);
+        });
+    }
+
+    function buildMenu(activeCellType){
+        var
+            menu = document.createElement('UL'),
+            types = ['text', 'numeric', 'date'],
+            item;
+
+        menu.className = 'changeTypeMenu';
+
+        for (var i = 0, len = types.length; i< len; i++) {
+            item = document.createElement('LI');
+            if('innerText' in item) {
+                item.innerText = types[i];
+            } else {
+                item.textContent = types[i];
+            }
+
+            item.data = {'colType': types[i]};
+
+            if (activeCellType == types[i]) {
+                item.className = 'active';
+            }
+            menu.appendChild(item);
+        }
+
+        return menu;
+    }
+
+    function buildButton() {
+        var button = document.createElement('BUTTON');
+
+        button.innerHTML = '\u25BC';
+        button.className = 'changeType';
+
+        return button;
+    }
+
+    function setColumnType(i, type, instance) {
+        columns[i].type = type;
+        instance.updateSettings({columns: columns});
+        instance.validateCells(function() {
+            instance.render();
+        });
+    }
+
 
     /** Drop it like it's hot **/
     DropSheet({

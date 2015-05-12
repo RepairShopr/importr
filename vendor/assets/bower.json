@@ -6,6 +6,7 @@
     "moment": "latest",
     "jszip": "latest",
     "alertify": "latest",
-    "handsontable": "latest"
+    "handsontable": "latest",
+    "fontawesome": "latest"
   }
 }
