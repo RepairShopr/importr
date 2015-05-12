@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Api key:</strong>
+  <%= @import.api_key %>
+</p>
+
+<p>
+  <strong>Resource type:</strong>
+  <%= @import.resource_type %>
+</p>
+
+<p>
+  <strong>Mapping:</strong>
+  <%= @import.mapping %>
+</p>
+
+<p>
+  <strong>Record count:</strong>
+  <%= @import.record_count %>
+</p>
+
+<p>
+  <strong>Success count:</strong>
+  <%= @import.success_count %>
+</p>
+
+<p>
+  <strong>Error count:</strong>
+  <%= @import.error_count %>
+</p>
+
+<%= link_to 'Edit', edit_import_path(@import) %> |
+<%= link_to 'Back', imports_path %>

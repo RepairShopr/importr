@@ -1,0 +1,16 @@
+<%= simple_form_for(@import) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+    <%= f.input :api_key %>
+    <%= f.input :resource_type %>
+    <%= f.input :mapping %>
+    <%= f.input :record_count %>
+    <%= f.input :success_count %>
+    <%= f.input :error_count %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

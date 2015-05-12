@@ -1,0 +1,11 @@
+{
+  "name": "dsl-generated dependencies",
+  "dependencies": {
+    "bootstrap": "latest",
+    "js-xlsx": "latest",
+    "moment": "latest",
+    "jszip": "latest",
+    "alertify": "latest",
+    "handsontable": "latest"
+  }
+}

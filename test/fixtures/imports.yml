@@ -1,0 +1,33 @@
+# == Schema Information
+#
+# Table name: imports
+#
+#  id            :integer          not null, primary key
+#  api_key       :string
+#  resource_type :string
+#  mapping       :text
+#  record_count  :integer
+#  success_count :integer
+#  error_count   :integer
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  uuid          :string
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  api_key: MyString
+  resource_type: MyString
+  mapping: MyText
+  record_count: 1
+  success_count: 1
+  error_count: 1
+
+two:
+  api_key: MyString
+  resource_type: MyString
+  mapping: MyText
+  record_count: 1
+  success_count: 1
+  error_count: 1
