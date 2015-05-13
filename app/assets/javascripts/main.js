@@ -78,6 +78,9 @@ $(document).ready(function() {
             }
         });
 
+
+        $('.cols-list').data("cols-list",columns);
+
         $("#hot").handsontable({
             data: json,
             startRows: 5,

@@ -48,12 +48,6 @@
 </div>
 
 <div class="fields-list" data-required-fields="<%= @import.fields_for_csv[:required].map {|i| i.keys.first} %>" data-suggested-fields="<%= @import.fields_for_csv[:suggested].map {|i| i.keys.first.to_s} %>"></div>
+<div class="cols-list" data-cols=""></div>
 
-<% unless Rails.env.production? %>
-<div class="alert alert-info">
-  <p class="debug-para">
-
-  </p>
-</div>
-<% end %>
 
