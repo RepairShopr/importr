@@ -51,7 +51,7 @@ var DropSheet = function DropSheet(opts) {
 		if(useworker && workbook.SSF) XLS.SSF.load_table(workbook.SSF);
 		var result = {};
 		workbook.SheetNames.forEach(function(sheetName) {
-			var roa = XL.utils.sheet_to_row_object_array(workbook.Sheets[sheetName], {raw:true});
+			var roa = XL.utils.sheet_to_row_object_array(workbook.Sheets[sheetName], {raw:false});
 			if(roa.length > 0) result[sheetName] = roa;
 		});
 		return result;
@@ -66,6 +66,7 @@ var DropSheet = function DropSheet(opts) {
 			val = sheet[XLS.utils.encode_cell({c: C, r: range.s.r})];
 			if(!val) continue;
 			columnHeaders[C] = type.toLowerCase() == 'xls' ? XLS.utils.format_cell(val) : val.v;
+			//columnHeaders[C] = type.toLowerCase() == 'xls' ? val.w : val.w;
 			//console.log(val, columnHeaders[C]);
 		}
 		return columnHeaders;

@@ -4,6 +4,7 @@
     "bootstrap": "latest",
     "js-xlsx": "latest",
     "moment": "latest",
+    "pikaday": "latest",
     "jszip": "latest",
     "alertify": "latest",
     "handsontable": "latest",

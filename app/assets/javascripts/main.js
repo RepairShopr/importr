@@ -6,7 +6,7 @@ $(document).ready(function() {
     var spinner;
 
     var _workstart = function() { spinner = new Spinner().spin(_target); }
-    var _workend = function() { spinner.stop();debugger; }
+    var _workend = function() { spinner.stop(); }
 
     /** Alerts **/
     var _badfile = function() {
@@ -68,7 +68,15 @@ $(document).ready(function() {
         json.unshift(function(head){var o = {}; for(i=0;i!=head.length;++i) o[head[i]] = head[i]; return o;}(cols));
         calculateSize();
         /* showtime! */
-        var columns = cols.map(function(x) { return {data:x, type: 'text'}; });
+        var columns = cols.map(function(x) {
+            //console.log("inside cols: " + x);
+            if(x.toLowerCase().includes("date") || x.toLowerCase().includes("_at")){
+                return  {data:x, type: 'date',correctFormat: true}
+            }
+            else{
+                return {data:x, type: 'text'};
+            }
+        });
 
         $("#hot").handsontable({
             data: json,
@@ -115,7 +123,7 @@ $(document).ready(function() {
                 }
             },
             afterChange: function(changes, source) {
-               console.log("just changed" +changes);
+                console.log("just changed" +changes);
                 if(Array.isArray(changes) === true && changes[0][0] == 0){
                     console.log("in header row");
                     var theLabel = $(".field-label." + changes[0][3]);
@@ -131,7 +139,7 @@ $(document).ready(function() {
                     }
                 }
 
-              }
+            }
         });
 
 

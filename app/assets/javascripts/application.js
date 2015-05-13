@@ -15,6 +15,7 @@
 //= require spinner
 //= require bootstrap
 //= require moment
+//= require pikaday
 //= require alertify
 //= require cpexcel.full
 //= require jszip

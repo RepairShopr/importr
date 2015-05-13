@@ -4,6 +4,7 @@
 asset 'bootstrap'
 asset "js-xlsx"
 asset "moment"
+asset "pikaday"
 asset 'jszip'
 asset 'alertify'
 asset 'handsontable'
