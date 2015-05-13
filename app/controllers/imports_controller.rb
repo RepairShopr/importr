@@ -48,6 +48,7 @@ class ImportsController < ApplicationController
   def update
     respond_to do |format|
       if @import.update(import_params)
+        @import.run_now
         format.html { redirect_to import_path(@import.uuid), notice: 'Import was successfully updated.' }
         format.json { render :show, status: :ok, location: @import }
       else
@@ -75,6 +76,6 @@ class ImportsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def import_params
-      params.require(:import).permit(:api_key, :resource_type, :mapping, :record_count, :success_count, :error_count)
+      params.require(:import).permit(:api_key, :subdomain, :resource_type, :mapping, :record_count, :success_count, :error_count, :data)
     end
 end

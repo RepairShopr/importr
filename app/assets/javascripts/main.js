@@ -82,8 +82,9 @@ $(document).ready(function() {
 
 
         $('.cols-list').data("cols-list",columns);
-
-        $("#hot").handsontable({
+        var container = document.getElementById('hot');
+         window.hotty = new Handsontable(container,
+           {
             data: json,
             startRows: 5,
             startCols: 3,
@@ -130,6 +131,7 @@ $(document).ready(function() {
             },
             afterChange: function(changes, source) {
                 console.log("just changed" +changes);
+                setupDataForForm();
                 if(Array.isArray(changes) === true && changes[0][0] == 0){
                     console.log("in header row");
                     var fieldNewName = changes[0][3];
@@ -162,7 +164,8 @@ $(document).ready(function() {
                 $('.date-formatter').fadeIn("slow");
                 $('.date-format-list').append('<li>'+ json[1][obj.data] +'<span></span></li>');
             }
-        })
+        });
+        setupDataForForm();
 
     };
 
@@ -196,6 +199,16 @@ $(document).ready(function() {
             Handsontable.Dom.removeEvent(document, 'click', removeMenu);
             Handsontable.Dom.addEvent(document, 'click', removeMenu);
         });
+    }
+
+    function setupDataForForm(){
+        if(typeof(hotty) != "undefined"){
+            $('#import_data').val(JSON.stringify(hotty.getData()));
+            console.log("updating the data...");
+        }
+        else{
+           console.log("hotty isnt there, maybe just booting up!");
+        }
     }
 
     function buildMenu(activeCellType){

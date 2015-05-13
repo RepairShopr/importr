@@ -13,6 +13,7 @@
 #  updated_at    :datetime         not null
 #  uuid          :string
 #  subdomain     :string
+#  data          :text
 #
 
 require 'test_helper'

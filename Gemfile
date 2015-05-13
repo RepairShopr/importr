@@ -18,6 +18,7 @@ gem 'redis'
 gem "bower-rails", "~> 0.9.2"
 
 gem 'simple_form'
+gem 'faraday'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'

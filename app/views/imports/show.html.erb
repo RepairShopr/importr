@@ -8,6 +8,7 @@
 
 <div class="row">
   <div class="col-md-2">
+    <!--######################### FIELD NOTES #########################-->
     <p>
       Based on the resource type <%= @import.resource_type %>, here are the fields:
     <ul>
@@ -20,7 +21,10 @@
     </ul>
     <span>* is required.</span>
     </p>
+
     <hr>
+    <!--######################### RESOURCE TYPE DROPDOWN #########################-->
+
     <%= simple_form_for @import, url: import_path(@import.uuid) do |f| %>
         <%= f.input :resource_type, as: :select, collection: Import::RESOURCE_COLLECTION %>
     <% end %>
@@ -31,7 +35,10 @@
             });
         });
     </script>
+
     <hr>
+    <!--######################### DATE FORMATTER #########################-->
+
     <div class="date-formatter" style="display:none;">
       <p>Select the Date format:</p>
       <select name="foo" id="date-formatter-select">
@@ -47,16 +54,30 @@
           $(function() {
               $('#date-formatter-select').change(function() {
                   var dateFormat = $(this).val();
+                  $("#import_mapping").val(dateFormat);
                   $('.date-format-list li').each(function(i,obj){
                       console.log("format: "+dateFormat);
                       console.log("text: "+$(obj).text());
-                   $(obj).children("span").text(" > "+ moment($(obj).text(), dateFormat).format());
+                      $(obj).children("span").text(" > "+ moment($(obj).text(), dateFormat).format());
                   });
 
               });
           });
       </script>
     </div>
+
+    <!--######################### BEGIN PROCESSING FORM/BUTTON #########################-->
+
+    <hr>
+
+    <%= simple_form_for @import, url: import_path(@import.uuid) do |f| %>
+        <%= f.input :subdomain %>
+        <%= f.input :api_key %>
+        <%= f.input :mapping, as: :hidden, input_html: {value: @import.mapping} %>
+        <%= f.input :data, as: :hidden, input_html: {value: @import.data} %>
+        <%= f.submit "Process" , class: "btn btn-success"%>
+    <% end %>
+
   </div>
   <div class="col-md-10">
 
