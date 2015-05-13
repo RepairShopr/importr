@@ -90,6 +90,7 @@ $(document).ready(function() {
             fixedRowsTop: 1,
             stretchH: 'all',
             rowHeaders: true,
+            contextMenu: ['row_above', 'row_below', 'remove_row'],
             columns: columns,
             colHeaders: cols.map(function(x,i) { return XLS.utils.encode_col(i); }),
             cells: function (r,c,p) {
