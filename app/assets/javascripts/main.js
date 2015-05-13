@@ -6,7 +6,9 @@ $(document).ready(function() {
     var spinner;
 
     var _workstart = function() { spinner = new Spinner().spin(_target); }
-    var _workend = function() { spinner.stop(); }
+    var _workend = function() {
+        spinner.stop();
+    }
 
     /** Alerts **/
     var _badfile = function() {
@@ -153,6 +155,13 @@ $(document).ready(function() {
             }
         });
 
+        $('.cols-list').data('cols-list').forEach(function(obj,i){
+            console.log("in cols: "+ obj + "i: " + i);
+            if(obj.type === 'date'){
+                $('.date-formatter').fadeIn("slow");
+                $('.date-format-list').append('<li>'+ json[1][obj.data] +'<span></span></li>');
+            }
+        })
 
     };
 

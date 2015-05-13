@@ -31,6 +31,32 @@
             });
         });
     </script>
+    <hr>
+    <div class="date-formatter" style="display:none;">
+      <p>Select the Date format:</p>
+      <select name="foo" id="date-formatter-select">
+        <option value="MM/DD/YY">MM/DD/YY</option>
+        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+      </select>
+      <p style="padding-top: 10px;">Live Preview:</p>
+      <ul class="date-format-list">
+
+      </ul>
+      <script>
+          $(function() {
+              $('#date-formatter-select').change(function() {
+                  var dateFormat = $(this).val();
+                  $('.date-format-list li').each(function(i,obj){
+                      console.log("format: "+dateFormat);
+                      console.log("text: "+$(obj).text());
+                   $(obj).children("span").text(" > "+ moment($(obj).text(), dateFormat).format());
+                  });
+
+              });
+          });
+      </script>
+    </div>
   </div>
   <div class="col-md-10">
 
