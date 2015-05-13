@@ -129,8 +129,16 @@ $(document).ready(function() {
                 console.log("just changed" +changes);
                 if(Array.isArray(changes) === true && changes[0][0] == 0){
                     console.log("in header row");
-                    var theLabel = $(".field-label." + changes[0][3]);
-                    if(theLabel){
+                    var fieldNewName = changes[0][3];
+                    var theLabel = $(".field-label." + fieldNewName);
+                    if(fieldNewName.includes("customer_")){
+                        console.log("trying to change the class");
+                        $('.customer_field').addClass("label-success");
+                        $('.customer_field').removeClass("label-warning");
+                        $($('.customer_field').children()[0]).addClass("fa-check-square-o");
+                        $($('.customer_field').children()[0]).removeClass("fa-square-o");
+                    }
+                    if(theLabel.size() > 0){
                         console.log("trying to change the class");
                         theLabel.addClass("label-success");
                         theLabel.removeClass("label-warning");

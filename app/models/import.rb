@@ -25,7 +25,9 @@ class Import < ActiveRecord::Base
     case resource_type
       when "ticket"
         {
-            required: [],
+            required: [
+                {customer_phone: "string"}
+            ],
             suggested: [
                 {number: 'string'},
                 {subject: 'string'},

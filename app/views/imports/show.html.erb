@@ -12,7 +12,7 @@
       Based on the resource type <%= @import.resource_type %>, here are the fields:
     <ul>
       <% @import.fields_for_csv[:required].each do |field| %>
-          <li><%= field.keys.first %>:<%= field.values.first %> *</li>
+          <li><%= field.keys.first %>:<%= field.values.first %>*</li>
       <% end %>
       <% @import.fields_for_csv[:suggested].each do |field| %>
           <li><%= field.keys.first %>:<%= field.values.first %> </li>
@@ -40,6 +40,9 @@
       <span>Fields to Map:</span>
       <% @import.fields_for_csv[:suggested].each do |field| %>
         <div class="label label-warning field-label <%= field.keys.first %>" style="padding: 5px;"><i class='fa fa-square-o'></i> <%= field.keys.first %></div>
+    <% end %>
+    <% if @import.resource_type != 'customer' %>
+        <div class="label label-warning customer_field" style="padding: 5px;"><i class="fa fa-square-o"></i> customer_phone or customer_email</div>
     <% end %>
     </p>
 
