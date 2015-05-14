@@ -306,7 +306,7 @@ class Import < ActiveRecord::Base
     asset[:phone] = row[@un_mapper["customer_phone"]]
 
     asset[:name] = row[@un_mapper["name"]]
-    asset[:asset_serial] = row[@un_mapper["customer_phone"]]
+    asset[:asset_serial] = row[@un_mapper["asset_serial"]]
     asset[:asset_type_name] = row[@un_mapper["asset_type_name"]]
     asset[:properties] = properties_unserializer(row)
     asset.compact!
