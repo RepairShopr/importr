@@ -87,12 +87,16 @@
     <output id="list"></output>
     <p>
       <span>Fields to Map:</span>
-      <% @import.fields_for_csv[:suggested].each do |field| %>
+      <% if @import.resource_type != 'customer' %>
+        <div class="label label-danger customer_field" style="padding: 5px;"><i class="fa fa-square-o"></i> customer_phone or customer_email</div>
+    <% end %>
+    <% @import.fields_for_csv[:required].each do |field| %>
+        <div class="label label-danger field-label <%= field.keys.first %>" style="padding: 5px;"><i class='fa fa-square-o'></i> <%= field.keys.first %></div>
+    <% end %>
+    <% @import.fields_for_csv[:suggested].each do |field| %>
         <div class="label label-warning field-label <%= field.keys.first %>" style="padding: 5px;"><i class='fa fa-square-o'></i> <%= field.keys.first %></div>
     <% end %>
-    <% if @import.resource_type != 'customer' %>
-        <div class="label label-warning customer_field" style="padding: 5px;"><i class="fa fa-square-o"></i> customer_phone or customer_email</div>
-    <% end %>
+
     </p>
 
     <div class="well processing" style="display:none;">
@@ -107,11 +111,11 @@
       </ol>
       <p>
         Note: It IS safe to retry because we won't create duplicates for ticket number or invoice number, or customer phone/email.
-        <ul>
-          <li>number already taken is a duplicate ticket number</li>
-          <li>customer_id required means we could not find a customer to attach them to</li>
-          <li>'anything' cant be blank, add some filler in the spreadsheet</li>
-        </ul>
+      <ul>
+        <li>number already taken is a duplicate ticket number</li>
+        <li>customer_id required means we could not find a customer to attach them to</li>
+        <li>'anything' cant be blank, add some filler in the spreadsheet</li>
+      </ul>
       </p>
     </div>
 

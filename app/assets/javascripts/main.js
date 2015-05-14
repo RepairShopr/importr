@@ -73,7 +73,8 @@ $(document).ready(function() {
         var columns = cols.map(function(x) {
             //console.log("inside cols: " + x);
             if(x.toLowerCase().includes("date") || x.toLowerCase().includes("_at")){
-                return  {data:x, type: 'date',correctFormat: true}
+                return  {data:x, type: 'date'}
+                //return  {data:x, type: 'text'}
             }
             else{
                 return {data:x, type: 'text'};
@@ -140,13 +141,15 @@ $(document).ready(function() {
                         console.log("trying to change the class");
                         $('.customer_field').addClass("label-success");
                         $('.customer_field').removeClass("label-warning");
+                        $('.customer_field').removeClass("label-danger");
                         $($('.customer_field').children()[0]).addClass("fa-check-square-o");
                         $($('.customer_field').children()[0]).removeClass("fa-square-o");
                     }
                     if(theLabel.size() > 0){
-                        console.log("trying to change the class");
+                        console.log("trying to change the class 2");
                         theLabel.addClass("label-success");
                         theLabel.removeClass("label-warning");
+                        theLabel.removeClass("label-danger");
                         $(theLabel.children()[0]).addClass("fa-check-square-o");
                         $(theLabel.children()[0]).removeClass("fa-square-o");
                     }

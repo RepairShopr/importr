@@ -25,7 +25,7 @@ class Import < ActiveRecord::Base
   serialize :data
   serialize :full_errors, Array
 
-  RESOURCE_TYPES = %w"ticket"
+  RESOURCE_TYPES = %w"ticket invoice"
   RESOURCE_COLLECTION = RESOURCE_TYPES.map {|i| [i.titleize,i]}
 
   def fields_for_csv
@@ -33,15 +33,25 @@ class Import < ActiveRecord::Base
       when "ticket"
         {
             required: [
-                {customer_phone: "string"}
+                {body: 'string'}
             ],
             suggested: [
                 {number: 'string'},
                 {subject: 'string'},
-                {body: 'string'},
                 {tech: 'string'},
                 {problem_type: 'string'},
                 {created_at: 'date'},
+            ]
+        }
+      when "invoice"
+        {
+            required: [
+                {number: 'string'},
+                {subtotal: 'string'},
+                {date: 'date'}
+            ],
+            suggested: [
+                {optional_line_item_name: 'string'},
             ]
         }
       else
@@ -58,6 +68,8 @@ class Import < ActiveRecord::Base
       case resource_type
         when 'ticket'
           run_ticket_import
+        when 'invoice'
+          run_invoice_import
       end
     end
   end
@@ -124,6 +136,60 @@ class Import < ActiveRecord::Base
 
   end
 
+
+  def run_invoice_import
+    client = TroysAPIClient.new(subdomain,api_key)
+    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.repairshopr.com"
+    if staging_run?
+      puts "STAGING_RUN going to gsub"
+      client.base_url.gsub!(".com",".co")
+    end
+    records = JSON.parse(data)
+
+    self.update(record_count: (rows_to_process || records.size-1))
+    self.error_count = 0
+    self.success_count = 0
+    self.full_errors = []
+
+    @un_mapper = {}
+    records.first.each do |r|
+      @un_mapper[r[1]] = r[0]
+    end
+
+    records[0..(rows_to_process || -1)].each_with_index do |row,index|
+      next if index == 0
+
+      begin
+
+        created_at = Time.strptime(row[@un_mapper['date']],time_mapping) rescue Time.now
+        invoice = build_invoice_hash(row,created_at)
+        result = client.create_invoice invoice
+        sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
+      rescue => ex
+        self.full_errors << "Invoice number: #{row[@un_mapper['number']]} Exception from Job: #{ex}"
+        self.error_count += 1
+        self.save
+        next
+      end
+
+      if result.status == 200
+        self.success_count += 1
+      else
+        self.full_errors << "Invoice number: #{row[@un_mapper['number']]} Import Error: #{result.body}"
+        self.error_count += 1
+      end
+      self.save
+
+    end
+
+    puts "Success: #{success_count}"
+    puts "Error: #{error_count}"
+    self.save
+
+  end
+
+  private
+
   def build_ticket_hash(row,created_at)
     ticket = {}
     ticket[:customer_name] = row[@un_mapper["customer_name"]]
@@ -150,4 +216,25 @@ class Import < ActiveRecord::Base
     comment[:updated_at] = created_at
     comment
   end
+
+
+  def build_invoice_hash(row,created_at)
+    invoice = {}
+    invoice[:customer_name] = row[@un_mapper["customer_name"]]
+    invoice[:email] = row[@un_mapper["customer_email"]]
+    invoice[:phone] = row[@un_mapper["customer_phone"]]
+    invoice[:date] = created_at
+    invoice[:paid] = true
+    invoice[:date_received] = created_at
+    invoice[:number] = row[@un_mapper['number']]
+    invoice[:line_items] = [
+        {item: 'Legacy', name: (row[@un_mapper['optional_line_item_name']].presence || 'Invoice Line Item'),
+         cost: 0.0,
+         price: row[@un_mapper['subtotal']].gsub('$','').gsub(' ','').to_f,
+         quantity: 1}
+    ]
+    invoice.compact!
+    invoice
+  end
+
 end
