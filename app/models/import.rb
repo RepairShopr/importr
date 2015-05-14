@@ -2,19 +2,20 @@
 #
 # Table name: imports
 #
-#  id            :integer          not null, primary key
-#  api_key       :string
-#  resource_type :string
-#  mapping       :text
-#  record_count  :integer
-#  success_count :integer
-#  error_count   :integer
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#  uuid          :string
-#  subdomain     :string
-#  data          :text
-#  full_errors   :text
+#  id              :integer          not null, primary key
+#  api_key         :string
+#  resource_type   :string
+#  mapping         :text
+#  record_count    :integer
+#  success_count   :integer
+#  error_count     :integer
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  uuid            :string
+#  subdomain       :string
+#  data            :text
+#  full_errors     :text
+#  rows_to_process :integer
 #
 
 class Import < ActiveRecord::Base
@@ -73,7 +74,7 @@ class Import < ActiveRecord::Base
     client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.repairshopr.co"
     records = JSON.parse(data)
 
-    self.update(record_count: records.size-1)
+    self.update(record_count: (rows_to_process || records.size-1))
     self.error_count = 0
     self.success_count = 0
     self.full_errors = []
@@ -83,7 +84,7 @@ class Import < ActiveRecord::Base
       @un_mapper[r[1]] = r[0]
     end
 
-    records.each_with_index do |row,index|
+    records[0..(rows_to_process)].each_with_index do |row,index|
       next if index == 0
 
       begin

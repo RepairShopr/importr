@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150513233833) do
+ActiveRecord::Schema.define(version: 20150514042808) do
 
   create_table "imports", force: :cascade do |t|
     t.string   "api_key"
@@ -20,12 +20,13 @@ ActiveRecord::Schema.define(version: 20150513233833) do
     t.integer  "record_count"
     t.integer  "success_count"
     t.integer  "error_count"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
     t.string   "uuid"
     t.string   "subdomain"
     t.text     "data"
     t.text     "full_errors"
+    t.integer  "rows_to_process"
   end
 
 end

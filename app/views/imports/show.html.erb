@@ -73,6 +73,7 @@
     <%= simple_form_for @import, url: import_path(@import.uuid) do |f| %>
         <%= f.input :subdomain %>
         <%= f.input :api_key %>
+        <%= f.input :rows_to_process, placeholder: "Leave blank for all" %>
         <%= f.input :mapping, as: :hidden, input_html: {value: @import.mapping} %>
         <%= f.input :data, as: :hidden, input_html: {value: @import.data} %>
         <%= f.submit "Process" , class: "btn btn-success"%>

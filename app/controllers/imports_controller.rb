@@ -85,6 +85,6 @@ class ImportsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def import_params
-    params.require(:import).permit(:api_key, :subdomain, :resource_type, :mapping, :record_count, :success_count, :error_count, :data)
+    params.require(:import).permit(:api_key, :subdomain, :resource_type, :mapping, :rows_to_process, :record_count, :success_count, :error_count, :data)
   end
 end
