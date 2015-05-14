@@ -58,7 +58,7 @@ class Import < ActiveRecord::Base
         {
             required: [
                 {name: 'string'},
-                {asset_type_id: 'string'}
+                {asset_type_name: 'string'}
             ],
             suggested: [
                 {asset_serial: 'string'},
@@ -307,6 +307,7 @@ class Import < ActiveRecord::Base
 
     asset[:name] = row[@un_mapper["name"]]
     asset[:asset_serial] = row[@un_mapper["customer_phone"]]
+    asset[:asset_type_name] = row[@un_mapper["asset_type_name"]]
     asset[:properties] = properties_unserializer(row)
     asset.compact!
     asset
