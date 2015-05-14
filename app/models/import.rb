@@ -16,6 +16,7 @@
 #  data            :text
 #  full_errors     :text
 #  rows_to_process :integer
+#  staging_run     :boolean          default(FALSE)
 #
 
 class Import < ActiveRecord::Base
@@ -71,7 +72,11 @@ class Import < ActiveRecord::Base
 
   def run_ticket_import
     client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.repairshopr.co"
+    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.repairshopr.com"
+    if staging_run?
+      puts "STAGING_RUN going to gsub"
+      client.base_url.gsub!(".com",".co")
+    end
     records = JSON.parse(data)
 
     self.update(record_count: (rows_to_process || records.size-1))

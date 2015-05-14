@@ -16,6 +16,7 @@
 #  data            :text
 #  full_errors     :text
 #  rows_to_process :integer
+#  staging_run     :boolean          default(FALSE)
 #
 
 require 'test_helper'
