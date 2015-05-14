@@ -93,7 +93,21 @@
     <% end %>
     </p>
 
+    <div class="well">
+      <h2 class="processing">Processing...</h2>
+      <h2 class="completed" style="display:none;">Done!</h2>
+      Total: <div class="totals"></div> <br>
+      Success Count: <div class="label label-success results"></div>  <br>
+      Error Count: <div class="label label-danger results"></div>
+      <p>Errors:</p>
+      <ol>
+
+      </ol>
+    </div>
+
     <div id="hot" style="overflow: scroll; height: 500px; width: 100%;" class="handsontable"></div>
+
+
   </div>
 </div>
 
@@ -101,3 +115,37 @@
 <div class="cols-list" data-cols=""></div>
 
 
+<script>
+    $(function() {
+
+        (function poll(){
+            setTimeout(function(){
+                $.ajax({
+                    url: '<%= import_path(@import.uuid).html_safe %>/status_poll',
+                    success: function(data){
+                        if(data.record_count === (data.success_count+data.error_count)){
+                            console.log(data);
+                            $(".totals").text(data.record_count);
+                            $(".label-success.results").text(data.success_count);
+                            $(".label-danger.results").text(data.error_count);
+                            $("h2.processing").fadeOut();
+                            $("h2.completed").fadeIn();
+                            data.full_errors.forEach(function(obj){
+                                console.log(obj);
+                                $("ol").append('<li>' + obj + '</li>');
+                            })
+                        }
+                        else{
+                            $(".totals").text(data.record_count);
+                            $(".label-success.results").text(data.success_count);
+                            $(".label-error.results").text(data.error_count);
+                            console.log(data);
+                            console.log("still polling...");
+                            poll();
+                        }
+                    }, dataType: "json"});
+            }, 4000);
+        })();
+    });
+
+</script>

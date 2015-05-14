@@ -14,6 +14,7 @@
 #  uuid          :string
 #  subdomain     :string
 #  data          :text
+#  full_errors   :text
 #
 
 require 'test_helper'

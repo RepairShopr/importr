@@ -1,5 +1,5 @@
 class ImportsController < ApplicationController
-  before_action :set_import, only: [:show, :edit, :update, :destroy]
+  before_action :set_import, only: [:show, :edit, :update, :destroy, :status_poll]
   protect_from_forgery :except => :sheetjsw
 
   # GET /imports
@@ -15,6 +15,15 @@ class ImportsController < ApplicationController
   # GET /imports/1
   # GET /imports/1.json
   def show
+  end
+
+  def status_poll
+    render json: {
+               success_count: @import.success_count.to_i,
+               record_count: @import.record_count.to_i,
+               error_count: @import.error_count.to_i,
+               full_errors: @import.full_errors
+           }
   end
 
   # GET /imports/new
@@ -48,7 +57,7 @@ class ImportsController < ApplicationController
   def update
     respond_to do |format|
       if @import.update(import_params)
-        @import.run_now
+        ImportWorker.perform_async(@import.id)
         format.html { redirect_to import_path(@import.uuid), notice: 'Import was successfully updated.' }
         format.json { render :show, status: :ok, location: @import }
       else
@@ -69,13 +78,13 @@ class ImportsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_import
-      @import = Import.find_by(uuid: params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_import
+    @import = Import.find_by(uuid: params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def import_params
-      params.require(:import).permit(:api_key, :subdomain, :resource_type, :mapping, :record_count, :success_count, :error_count, :data)
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def import_params
+    params.require(:import).permit(:api_key, :subdomain, :resource_type, :mapping, :record_count, :success_count, :error_count, :data)
+  end
 end

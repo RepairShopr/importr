@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150513190354) do
+ActiveRecord::Schema.define(version: 20150513233833) do
 
   create_table "imports", force: :cascade do |t|
     t.string   "api_key"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20150513190354) do
     t.string   "uuid"
     t.string   "subdomain"
     t.text     "data"
+    t.text     "full_errors"
   end
 
 end

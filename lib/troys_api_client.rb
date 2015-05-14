@@ -46,13 +46,11 @@ class TroysAPIClient
   def create_customer params
     setup_connection
     response = @conn.post "#{api_version}/customers.json?api_key=#{@api_key}", params
-    JSON.parse response.body
   end
 
   def create_vendor params
     setup_connection
     response = @conn.post "#{api_version}/vendors.json?api_key=#{@api_key}", params
-    JSON.parse response.body
   end
 
   def create_schedule params
@@ -74,19 +72,16 @@ class TroysAPIClient
   def create_invoice params
     setup_connection
     response = @conn.post "#{@api_version}/invoices.json?api_key=#{@api_key}", params
-    JSON.parse response.body
   end
 
   def create_ticket params
     setup_connection
     response = @conn.post "#{@api_version}/tickets.json?api_key=#{@api_key}", params
-    JSON.parse response.body
   end
 
   def create_comment params
     setup_connection
     response = @conn.post "#{@api_version}/tickets/#{params[:number]}/comment.json?api_key=#{@api_key}", params
-    JSON.parse response.body
   end
 
   def demo_invoice

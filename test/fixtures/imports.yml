@@ -14,6 +14,7 @@
 #  uuid          :string
 #  subdomain     :string
 #  data          :text
+#  full_errors   :text
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
