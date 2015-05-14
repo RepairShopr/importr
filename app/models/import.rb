@@ -102,7 +102,7 @@ class Import < ActiveRecord::Base
         result = client.create_ticket ticket
         sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
       rescue => ex
-        self.full_errors << "Exception from Job: #{ex}"
+        self.full_errors << "Ticket number: #{row[@un_mapper['number']]} Exception from Job: #{ex}"
         self.error_count += 1
         self.save
         next
@@ -111,7 +111,7 @@ class Import < ActiveRecord::Base
       if result.status == 200
         self.success_count += 1
       else
-        self.full_errors << result.body
+        self.full_errors << "Ticket number: #{row[@un_mapper['number']]} Import Error: #{result.body}"
         self.error_count += 1
       end
       self.save
