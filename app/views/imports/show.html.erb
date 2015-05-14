@@ -22,6 +22,14 @@
     <span>* is required.</span>
     </p>
 
+    <% if @import.fields_for_csv[:example_file].present? %>
+        <hr>
+        <a href="<%= @import.fields_for_csv[:example_file].html_safe  %>" target="_blank">
+          <%= image_tag "excel.png", style: "max-width: 40px;"%>
+          Download Example
+        </a>
+    <% end %>
+
     <hr>
     <!--######################### RESOURCE TYPE DROPDOWN #########################-->
 

@@ -41,7 +41,8 @@ class Import < ActiveRecord::Base
                 {tech: 'string'},
                 {problem_type: 'string'},
                 {created_at: 'date'},
-            ]
+            ],
+            example_file: "https://dl.dropboxusercontent.com/u/15079951/repairshopr/Importer-Tickets.xlsx"
         }
       when "invoice"
         {
@@ -52,7 +53,8 @@ class Import < ActiveRecord::Base
             ],
             suggested: [
                 {optional_line_item_name: 'string'},
-            ]
+            ],
+            example_file: "https://dl.dropboxusercontent.com/u/15079951/repairshopr/Importer-Invoice.xlsx"
         }
       when 'asset'
         {
@@ -63,7 +65,8 @@ class Import < ActiveRecord::Base
             suggested: [
                 {asset_serial: 'string'},
                 {properties: 'string'},
-            ]
+            ],
+            example_file: "https://dl.dropboxusercontent.com/u/15079951/repairshopr/Importer-Assets.xlsx"
         }
       else
         {required: [],suggested: []}
