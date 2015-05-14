@@ -90,7 +90,7 @@ class Import < ActiveRecord::Base
       @un_mapper[r[1]] = r[0]
     end
 
-    records[0..(rows_to_process)].each_with_index do |row,index|
+    records[0..(rows_to_process || -0)].each_with_index do |row,index|
       next if index == 0
 
       begin
@@ -114,7 +114,7 @@ class Import < ActiveRecord::Base
         self.full_errors << result.body
         self.error_count += 1
       end
-
+      self.save
 
     end
 
