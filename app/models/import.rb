@@ -95,6 +95,7 @@ class Import < ActiveRecord::Base
         sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
       rescue => ex
         self.full_errors << "Exception from Job: #{ex}"
+        self.error_count += 1
         self.save
         next
       end
@@ -102,7 +103,7 @@ class Import < ActiveRecord::Base
       if result.status == 200
         self.success_count += 1
       else
-        full_errors << result.body
+        self.full_errors << result.body
         self.error_count += 1
       end
 
