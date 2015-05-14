@@ -25,7 +25,7 @@ class Import < ActiveRecord::Base
   serialize :data
   serialize :full_errors, Array
 
-  RESOURCE_TYPES = %w"ticket invoice"
+  RESOURCE_TYPES = %w"ticket invoice asset"
   RESOURCE_COLLECTION = RESOURCE_TYPES.map {|i| [i.titleize,i]}
 
   def fields_for_csv
@@ -54,6 +54,17 @@ class Import < ActiveRecord::Base
                 {optional_line_item_name: 'string'},
             ]
         }
+      when 'asset'
+        {
+            required: [
+                {name: 'string'},
+                {asset_type_id: 'string'}
+            ],
+            suggested: [
+                {asset_serial: 'string'},
+                {properties: 'string'},
+            ]
+        }
       else
         {required: [],suggested: []}
     end
@@ -70,6 +81,8 @@ class Import < ActiveRecord::Base
           run_ticket_import
         when 'invoice'
           run_invoice_import
+        when 'asset'
+          run_asset_import
       end
     end
   end
@@ -188,6 +201,56 @@ class Import < ActiveRecord::Base
 
   end
 
+  def run_asset_import
+    client = TroysAPIClient.new(subdomain,api_key)
+    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.repairshopr.com"
+    if staging_run?
+      puts "STAGING_RUN going to gsub"
+      client.base_url.gsub!(".com",".co")
+    end
+    records = JSON.parse(data)
+
+    self.update(record_count: (rows_to_process || records.size-1))
+    self.error_count = 0
+    self.success_count = 0
+    self.full_errors = []
+
+    @un_mapper = {}
+    records.first.each do |r|
+      @un_mapper[r[1]] = r[0]
+    end
+
+    records[0..(rows_to_process || -1)].each_with_index do |row,index|
+      next if index == 0
+
+      begin
+
+        asset = build_asset_hash(row)
+        result = client.create_asset asset
+        sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
+      rescue => ex
+        self.full_errors << "Asset name: #{row[@un_mapper['name']]} Exception from Job: #{ex}"
+        self.error_count += 1
+        self.save
+        next
+      end
+
+      if result.status == 200
+        self.success_count += 1
+      else
+        self.full_errors << "Asset name: #{row[@un_mapper['name']]} Import Error: #{result.body}"
+        self.error_count += 1
+      end
+      self.save
+
+    end
+
+    puts "Success: #{success_count}"
+    puts "Error: #{error_count}"
+    self.save
+
+  end
+
   private
 
   def build_ticket_hash(row,created_at)
@@ -217,7 +280,6 @@ class Import < ActiveRecord::Base
     comment
   end
 
-
   def build_invoice_hash(row,created_at)
     invoice = {}
     invoice[:customer_name] = row[@un_mapper["customer_name"]]
@@ -235,6 +297,31 @@ class Import < ActiveRecord::Base
     ]
     invoice.compact!
     invoice
+  end
+
+  def build_asset_hash(row)
+    asset = {}
+    asset[:customer_name] = row[@un_mapper["customer_name"]]
+    asset[:email] = row[@un_mapper["customer_email"]]
+    asset[:phone] = row[@un_mapper["customer_phone"]]
+
+    asset[:name] = row[@un_mapper["name"]]
+    asset[:asset_serial] = row[@un_mapper["customer_phone"]]
+    asset[:properties] = properties_unserializer(row)
+    asset.compact!
+    asset
+  end
+
+  def properties_unserializer(row)
+    properties = {}
+    if row[@un_mapper["properties"]].present?
+      fields = row[@un_mapper["properties"]].split(";")
+      fields.each do |field|
+        k,v = field.split(":")
+        properties[k] = v
+      end
+    end
+    properties
   end
 
 end

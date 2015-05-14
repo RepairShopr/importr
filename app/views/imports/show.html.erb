@@ -87,8 +87,10 @@
     <output id="list"></output>
     <p>
       <span>Fields to Map:</span>
-      <% if @import.resource_type != 'customer' %>
+      <% if ['invoice','ticket'].include?(@import.resource_type) %>
         <div class="label label-danger customer_field" style="padding: 5px;"><i class="fa fa-square-o"></i> customer_phone or customer_email</div>
+    <% elsif ['asset'].include?(@import.resource_type) %>
+        <div class="label label-warning customer_field" style="padding: 5px;"><i class="fa fa-square-o"></i> customer_phone or customer_email (optional)</div>
     <% end %>
     <% @import.fields_for_csv[:required].each do |field| %>
         <div class="label label-danger field-label <%= field.keys.first %>" style="padding: 5px;"><i class='fa fa-square-o'></i> <%= field.keys.first %></div>
