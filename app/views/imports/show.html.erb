@@ -93,7 +93,7 @@
     <% end %>
     </p>
 
-    <div class="well">
+    <div class="well processing" style="display:none;">
       <h2 class="processing">Processing...</h2>
       <h2 class="completed" style="display:none;">Done!</h2>
       Total: <div class="totals"></div> <br>
@@ -123,7 +123,7 @@
                 $.ajax({
                     url: '<%= import_path(@import.uuid).html_safe %>/status_poll',
                     success: function(data){
-                        if(data.record_count === (data.success_count+data.error_count)){
+                        if(data.record_count > 0 && data.record_count === (data.success_count+data.error_count)){
                             console.log(data);
                             $(".totals").text(data.record_count);
                             $(".label-success.results").text(data.success_count);
@@ -136,6 +136,9 @@
                             })
                         }
                         else{
+                            if(data.record_count > 0){
+                                $(".well.processing").show();
+                            }
                             $(".totals").text(data.record_count);
                             $(".label-success.results").text(data.success_count);
                             $(".label-error.results").text(data.error_count);
