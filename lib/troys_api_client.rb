@@ -95,7 +95,7 @@ class TroysAPIClient
   end
 
   def setup_connection
-    @conn = Faraday.new(:url => "#{base_url}" ) do |faraday|
+    @conn = Faraday.new(:url => "#{base_url}", :ssl => {:verify => false} ) do |faraday|
       faraday.request  :url_encoded             # form-encode POST params
       faraday.response :logger                  # log requests to STDOUT
       faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
