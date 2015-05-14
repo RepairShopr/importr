@@ -125,6 +125,9 @@
                     success: function(data){
                         if(data.record_count > 0 && data.record_count === (data.success_count+data.error_count)){
                             console.log(data);
+                            if(data.record_count > 0){
+                                $(".well.processing").show();
+                            }
                             $(".totals").text(data.record_count);
                             $(".label-success.results").text(data.success_count);
                             $(".label-danger.results").text(data.error_count);
