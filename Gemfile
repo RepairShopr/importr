@@ -8,6 +8,7 @@ group :development do
   gem 'sqlite3'
   gem 'guard-livereload', '~> 2.4', require: false
   gem 'annotate', '~> 2.6.6'
+  gem 'rerun'
 end
 
 group :production do

@@ -1,2 +1,3 @@
 :concurrency: 5
-
+:queues:
+  - importer_default
