@@ -87,7 +87,8 @@ class Import < ActiveRecord::Base
       next if index == 0
 
       begin
-        created_at = Time.strptime(row[@un_mapper['created_at']],i.time_mapping) rescue Time.now
+
+        created_at = Time.strptime(row[@un_mapper['created_at']],time_mapping) rescue Time.now
         comment = build_comment_hash(row,created_at)
         ticket = build_ticket_hash(row,created_at)
         ticket[:comments_attributes] = [comment]
