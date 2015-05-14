@@ -63,6 +63,7 @@ class Import < ActiveRecord::Base
   end
 
   def time_mapping
+    #converting from momentjs -> ruby strptime
     mapping.gsub!("YYYY","%Y")
     mapping.gsub!("YY","%y")
     mapping.gsub!("MM","%m")
