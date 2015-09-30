@@ -1,0 +1,12 @@
+<% if params[:commit] == "Process" %>
+$(".bhv-submit").addClass('disabled');
+$(".bhv-submit").val('Process (refresh to resubmit)');
+<% end %>
+$( ".bhv-progress" ).hide();
+$( ".bhv-progress" ).text( "saved." );
+$( ".bhv-progress" ).addClass( "alert alert-success" );
+$( ".bhv-progress" ).fadeIn( "slow" );
+setTimeout(function() {
+    $( ".bhv-progress" ).fadeOut( "slow" );
+}, 5000);
+
