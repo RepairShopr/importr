@@ -39,7 +39,7 @@
     <script>
         $(function() {
             $('#import_resource_type').change(function() {
-                this.form.submit();
+                $(this).form.submit();
             });
         });
     </script>
@@ -50,6 +50,7 @@
     <div class="date-formatter" style="display:none;">
       <p>Select the Date format:</p>
       <select name="foo" id="date-formatter-select">
+        <option value="">Change Me</option>
         <option value="MM/DD/YY">MM/DD/YY</option>
         <option value="MM/DD/YYYY">MM/DD/YYYY</option>
         <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -67,6 +68,11 @@
                       console.log("format: "+dateFormat);
                       console.log("text: "+$(obj).text());
                       $(obj).children("span").text(" > "+ moment($(obj).text(), dateFormat).format());
+
+                      //now that we put it in the form, lets send an update so this persists..
+                      $(".bhv-submit").val("Process Update");
+                      $(".bhv-submit").trigger('click.rails');
+                      $(".bhv-submit").val("Process");
                   });
 
               });
@@ -78,14 +84,24 @@
 
     <hr>
 
-    <%= simple_form_for @import, url: import_path(@import.uuid) do |f| %>
-        <%= f.input :subdomain %>
-        <%= f.input :api_key %>
+    <%= simple_form_for @import, url: import_path(@import.uuid), remote: true  do |f| %>
+        <%= f.input :subdomain, input_html: {class: "bhv-blur-save"} %>
+        <%= f.input :api_key, input_html: {class: "bhv-blur-save"} %>
         <%= f.input :rows_to_process, placeholder: "Leave blank for all" %>
         <%= f.input :staging_run, label: false, inline_label: "Run against Staging instead of production" %>
         <%= f.input :mapping, as: :hidden, input_html: {value: @import.mapping} %>
         <%= f.input :data, as: :hidden, input_html: {value: @import.data} %>
-        <%= f.submit "Process" , class: "btn btn-success"%>
+        <%= f.submit "Process" , class: "btn btn-success bhv-submit" %>
+
+        <script>
+            $(function() {
+                $('.bhv-blur-save').blur(function() {
+                    $(".bhv-submit").val("Process Update");
+                    $(".bhv-submit").trigger('click.rails');
+                    $(".bhv-submit").val("Process");
+                });
+            });
+        </script>
     <% end %>
 
   </div>

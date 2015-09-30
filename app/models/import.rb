@@ -1,4 +1,5 @@
 class Import < ActiveRecord::Base
+
   before_save :generate_uuid
 
   serialize :data

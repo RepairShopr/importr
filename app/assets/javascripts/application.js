@@ -11,9 +11,7 @@
 // about supported directives.
 //
 //= require jquery
-//= require jquery_ujs
 //= require spinner
-//= require bootstrap
 //= require moment
 //= require pikaday
 //= require alertify
@@ -23,4 +21,4 @@
 //= require dropsheet
 //= require handsontable
 //= require main
-//= require_tree .
+//= require jquery_ujs
