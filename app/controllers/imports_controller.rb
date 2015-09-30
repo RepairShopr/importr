@@ -56,6 +56,11 @@ class ImportsController < ApplicationController
   # PATCH/PUT /imports/1.json
   def update
     respond_to do |format|
+      if @import.mapping.present? && params[:import][:mapping].blank?
+        #lets just protect a tiny bit against nil'ing out the mapping on accidental blur submits..
+        params[:import][:mapping] = @import.mapping
+      end
+
       if @import.update(import_params)
         ImportWorker.perform_async(@import.id) if params[:commit] == "Process"
         format.html { redirect_to import_path(@import.uuid), notice: 'Import was successfully updated.' }
