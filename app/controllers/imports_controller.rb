@@ -28,7 +28,7 @@ class ImportsController < ApplicationController
 
   # GET /imports/new
   def new
-    @import = Import.create
+    @import = Import.create(subdomain: params[:subdomain], api_key: params[:api_key], resource_type: params[:resource_type])
     redirect_to import_path(@import.uuid)
   end
 

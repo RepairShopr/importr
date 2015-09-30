@@ -278,6 +278,7 @@ class Import < ActiveRecord::Base
          price: row[@un_mapper['subtotal']].gsub('$','').gsub(' ','').to_f,
          quantity: 1}
     ]
+    invoice[:note] = "Processed by Importr session: #{uuid}"
     invoice.compact!
     invoice
   end
