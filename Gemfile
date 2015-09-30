@@ -7,9 +7,9 @@ group :development do
 # Use sqlite3 as the database for Active Record
   gem 'sqlite3'
   gem 'guard-livereload', '~> 2.4', require: false
-  gem 'annotate', '~> 2.6.6'
   gem 'rerun'
   gem 'pry'
+  gem 'annotate'
 end
 
 group :production do
