@@ -47,7 +47,7 @@
     <hr>
     <!--######################### DATE FORMATTER #########################-->
 
-    <div class="date-formatter" style="display:none;">
+    <div class="date-formatter alert alert-danger" style="display:none;">
       <p>Select the Date format:</p>
       <select name="foo" id="date-formatter-select">
         <option value="">Change Me</option>
@@ -62,9 +62,11 @@
       <script>
           $(function() {
               $('#date-formatter-select').change(function() {
+                  $('.date-formatter').removeClass("alert alert-danger");
                   var dateFormat = $(this).val();
                   $("#import_mapping").val(dateFormat);
                   $('.date-format-list li').each(function(i,obj){
+                      $(obj).show();
                       console.log("format: "+dateFormat);
                       console.log("text: "+$(obj).text());
                       $(obj).children("span").text(" > "+ moment($(obj).text(), dateFormat).format());

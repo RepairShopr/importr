@@ -165,7 +165,7 @@ $(document).ready(function() {
             console.log("in cols: "+ obj + "i: " + i);
             if(obj.type === 'date'){
                 $('.date-formatter').fadeIn("slow");
-                $('.date-format-list').append('<li>'+ json[1][obj.data] +'<span></span></li>');
+                $('.date-format-list').append('<li style="display:none;">'+ json[1][obj.data] +'<span></span></li>');
             }
         });
         setupDataForForm();
