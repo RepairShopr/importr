@@ -18,6 +18,10 @@
 #  rows_to_process :integer
 #  staging_run     :boolean          default(FALSE)
 #
+# Indexes
+#
+#  index_imports_on_uuid  (uuid)
+#
 
 require 'test_helper'
 

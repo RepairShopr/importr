@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150514141000) do
+ActiveRecord::Schema.define(version: 20160412181225) do
 
   create_table "imports", force: :cascade do |t|
     t.string   "api_key"
@@ -29,5 +29,7 @@ ActiveRecord::Schema.define(version: 20150514141000) do
     t.integer  "rows_to_process"
     t.boolean  "staging_run",     default: false
   end
+
+  add_index "imports", ["uuid"], name: "index_imports_on_uuid", using: :btree
 
 end
