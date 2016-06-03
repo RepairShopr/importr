@@ -286,6 +286,7 @@ class Import < ActiveRecord::Base
   def build_asset_hash(row)
     asset = {}
     asset[:customer_name] = row[@un_mapper["customer_name"]]
+    asset[:customer_id] = row[@un_mapper["customer_id"]]
     asset[:email] = row[@un_mapper["customer_email"]]
     asset[:phone] = row[@un_mapper["customer_phone"]]
 
