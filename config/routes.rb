@@ -16,8 +16,8 @@ Rails.application.routes.draw do
     ActiveSupport::SecurityUtils.secure_compare(username, ENV["SIDEKIQ_USERNAME"]) &
       ActiveSupport::SecurityUtils.secure_compare(password, ENV["SIDEKIQ_PASSWORD"])
   end if Rails.env.production?
-  mount Sidekiq::Web, at: "/sidekiq"
-  
+mount Sidekiq::Web => '/sidekiq'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
