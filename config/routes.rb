@@ -8,6 +8,16 @@ Rails.application.routes.draw do
     end
   end
 
+  require "sidekiq/web"
+  Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+    # Protect against timing attacks: (https://codahale.com/a-lesson-in-timing-attacks/)
+    # - Use & (do not use &&) so that it doesn't short circuit.
+    # - Use `secure_compare` to stop length information leaking
+    ActiveSupport::SecurityUtils.secure_compare(username, ENV["SIDEKIQ_USERNAME"]) &
+      ActiveSupport::SecurityUtils.secure_compare(password, ENV["SIDEKIQ_PASSWORD"])
+  end if Rails.env.production?
+  mount Sidekiq::Web, at: "/sidekiq"
+  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
