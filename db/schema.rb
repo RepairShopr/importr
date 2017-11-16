@@ -30,6 +30,6 @@ ActiveRecord::Schema.define(version: 20160412181225) do
     t.boolean  "staging_run",     default: false
   end
 
-  add_index "imports", ["uuid"], name: "index_imports_on_uuid", using: :btree
+  add_index "imports", ["uuid"], name: "index_imports_on_uuid"
 
 end
