@@ -87,6 +87,7 @@
     <hr>
 
     <%= simple_form_for @import, url: import_path(@import.uuid), remote: true  do |f| %>
+        <%= f.input :platform, collection: ['repairshopr','syncro'], input_html: {class: "bhv-blur-save"} %>
         <%= f.input :subdomain, input_html: {class: "bhv-blur-save"} %>
         <%= f.input :api_key, input_html: {class: "bhv-blur-save"} %>
         <%= f.input :rows_to_process, placeholder: "Leave blank for all" %>

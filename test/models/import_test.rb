@@ -17,6 +17,7 @@
 #  full_errors     :text
 #  rows_to_process :integer
 #  staging_run     :boolean          default(FALSE)
+#  platform        :string
 #
 # Indexes
 #

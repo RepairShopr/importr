@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160412181225) do
+ActiveRecord::Schema.define(version: 20171116040610) do
 
   create_table "imports", force: :cascade do |t|
     t.string   "api_key"
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20160412181225) do
     t.text     "full_errors"
     t.integer  "rows_to_process"
     t.boolean  "staging_run",     default: false
+    t.string   "platform"
   end
 
   add_index "imports", ["uuid"], name: "index_imports_on_uuid"

@@ -81,7 +81,7 @@ class Import < ActiveRecord::Base
 
   def run_ticket_import
     client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.repairshopr.com"
+    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
     if staging_run?
       puts "STAGING_RUN going to gsub"
       client.base_url.gsub!(".com",".co")
@@ -135,7 +135,7 @@ class Import < ActiveRecord::Base
 
   def run_invoice_import
     client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.repairshopr.com"
+    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
     if staging_run?
       puts "STAGING_RUN going to gsub"
       client.base_url.gsub!(".com",".co")
@@ -186,7 +186,7 @@ class Import < ActiveRecord::Base
 
   def run_asset_import
     client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.repairshopr.com"
+    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
     if staging_run?
       puts "STAGING_RUN going to gsub"
       client.base_url.gsub!(".com",".co")
@@ -332,6 +332,7 @@ end
 #  full_errors     :text
 #  rows_to_process :integer
 #  staging_run     :boolean          default(FALSE)
+#  platform        :string
 #
 # Indexes
 #
