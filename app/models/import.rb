@@ -210,7 +210,7 @@ class Import < ActiveRecord::Base
       begin
 
         asset = build_asset_hash(row)
-        result = client.create_or_update('customer_asset', asset)
+        result = client.create_or_update('customer_assets', asset)
         sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
       rescue => ex
         self.full_errors << "Asset name: #{row[@un_mapper['name']]} Exception from Job: #{ex}"

@@ -91,11 +91,16 @@ class TroysAPIClient
 
   def create_or_update type, params
     setup_connection
-    url = [@api_version, type, params[:id]].compact.join('/')
+    id = params.delete(:id)
+    url = [@api_version, type, id].compact.join('/')
     payload = params
     payload[:api_key] = @api_key
     payload[:format] = 'json'
-    @conn.post(url, params)
+    if id.present?
+      @conn.put(url, params)
+    else
+      @conn.post(url, params)
+    end
   end
 
   def demo_invoice
