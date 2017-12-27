@@ -89,6 +89,20 @@ class TroysAPIClient
     response = @conn.post "#{@api_version}/customer_assets.json?api_key=#{@api_key}", params
   end
 
+  def create_or_update type, params
+    setup_connection
+    id = params.delete(:id)
+    url = [@api_version, type, id].compact.join('/')
+    payload = params
+    payload[:api_key] = @api_key
+    payload[:format] = 'json'
+    if id.present?
+      @conn.put(url, params)
+    else
+      @conn.post(url, params)
+    end
+  end
+
   def demo_invoice
     new_invoice = {}
     new_invoice[:customer_id] = '120018'

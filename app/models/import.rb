@@ -43,6 +43,7 @@ class Import < ActiveRecord::Base
                 {asset_type_name: 'string'}
             ],
             suggested: [
+                {asset_id: 'string'},
                 {asset_serial: 'string'},
                 {properties: 'string'},
             ],
@@ -209,7 +210,7 @@ class Import < ActiveRecord::Base
       begin
 
         asset = build_asset_hash(row)
-        result = client.create_asset asset
+        result = client.create_or_update('customer_assets', asset)
         sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
       rescue => ex
         self.full_errors << "Asset name: #{row[@un_mapper['name']]} Exception from Job: #{ex}"
@@ -285,6 +286,7 @@ class Import < ActiveRecord::Base
 
   def build_asset_hash(row)
     asset = {}
+    asset[:id] = row[@un_mapper["asset_id"]]
     asset[:customer_name] = row[@un_mapper["customer_name"]]
     asset[:customer_id] = row[@un_mapper["customer_id"]]
     asset[:email] = row[@un_mapper["customer_email"]]
