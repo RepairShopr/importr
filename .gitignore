@@ -2,6 +2,7 @@ dump.rdb
 .metadata
 .rvmrc
 .rbenv-version
+.rbenv-gemsets
 .ruby-version
 .ruby-gemset
 .bundle

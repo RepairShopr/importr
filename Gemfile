@@ -1,9 +1,11 @@
 source 'https://rubygems.org'
+# ruby "~> 2.5.1" # min "~> 2.3.7" which is not available on Heroku-18
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.10'
 ruby '2.1.5'
+
 group :development do
 # Use sqlite3 as the database for Active Record
   gem 'sqlite3'

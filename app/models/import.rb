@@ -81,12 +81,8 @@ class Import < ActiveRecord::Base
   end
 
   def run_ticket_import
-    client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
-    if staging_run?
-      puts "STAGING_RUN going to gsub"
-      client.base_url.gsub!(".com",".co")
-    end
+    host = 'repairshopr.co' if staging_run?
+    client = TroysAPIClient.new(subdomain, api_key, platform: platform, host: host)
     records = JSON.parse(data)
 
     self.update(record_count: (rows_to_process || records.size-1))
@@ -117,10 +113,10 @@ class Import < ActiveRecord::Base
         next
       end
 
-      if result.status == 200
+      if client.last_response.status == 200
         self.success_count += 1
       else
-        self.full_errors << "Ticket number: #{row[@un_mapper['number']]} Import Error: #{result.body}"
+        self.full_errors << "Ticket number: #{row[@un_mapper['number']]} Import Error: #{result}"
         self.error_count += 1
       end
       self.save
@@ -135,12 +131,8 @@ class Import < ActiveRecord::Base
 
 
   def run_invoice_import
-    client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
-    if staging_run?
-      puts "STAGING_RUN going to gsub"
-      client.base_url.gsub!(".com",".co")
-    end
+    host = 'repairshopr.co' if staging_run?
+    client = TroysAPIClient.new(subdomain, api_key, platform: platform, host: host)
     records = JSON.parse(data)
 
     self.update(record_count: (rows_to_process || records.size-1))
@@ -169,10 +161,10 @@ class Import < ActiveRecord::Base
         next
       end
 
-      if result.status == 200
+      if client.last_response.status == 200
         self.success_count += 1
       else
-        self.full_errors << "Invoice number: #{row[@un_mapper['number']]} Import Error: #{result.body}"
+        self.full_errors << "Invoice number: #{row[@un_mapper['number']]} Import Error: #{result}"
         self.error_count += 1
       end
       self.save
@@ -186,12 +178,8 @@ class Import < ActiveRecord::Base
   end
 
   def run_asset_import
-    client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
-    if staging_run?
-      puts "STAGING_RUN going to gsub"
-      client.base_url.gsub!(".com",".co")
-    end
+    host = 'repairshopr.co' if staging_run?
+    client = TroysAPIClient.new(subdomain, api_key, platform: platform, host: host)
     records = JSON.parse(data)
 
     self.update(record_count: (rows_to_process || records.size-1))
@@ -219,10 +207,10 @@ class Import < ActiveRecord::Base
         next
       end
 
-      if result.status == 200
+      if client.last_response.status == 200
         self.success_count += 1
       else
-        self.full_errors << "Asset name: #{row[@un_mapper['name']]} Import Error: #{result.body}"
+        self.full_errors << "Asset name: #{row[@un_mapper['name']]} Import Error: #{result}"
         self.error_count += 1
       end
       self.save
