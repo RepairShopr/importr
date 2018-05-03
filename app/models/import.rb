@@ -81,105 +81,49 @@ class Import < ActiveRecord::Base
   end
 
   def run_ticket_import
-    host = 'repairshopr.co' if staging_run?
-    client = TroysAPIClient.new(subdomain, api_key, platform: platform, host: host)
-    records = JSON.parse(data)
-
-    self.update(record_count: (rows_to_process || records.size-1))
-    self.error_count = 0
-    self.success_count = 0
-    self.full_errors = []
-
-    @un_mapper = {}
-    records.first.each do |r|
-      @un_mapper[r[1]] = r[0]
+    process_for('Ticket', 'number') do |row|
+      created_at = Time.strptime(row[@un_mapper['created_at']],time_mapping)
+      comment = build_comment_hash(row,created_at)
+      ticket = build_ticket_hash(row,created_at)
+      ticket[:comments_attributes] = [comment]
+      result = client.create_ticket ticket
+      sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
+      result
     end
-
-    records[0..(rows_to_process || -1)].each_with_index do |row,index|
-      next if index == 0
-
-      begin
-
-        created_at = Time.strptime(row[@un_mapper['created_at']],time_mapping)
-        comment = build_comment_hash(row,created_at)
-        ticket = build_ticket_hash(row,created_at)
-        ticket[:comments_attributes] = [comment]
-        result = client.create_ticket ticket
-        sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
-      rescue => ex
-        self.full_errors << "Ticket number: #{row[@un_mapper['number']]} Exception from Job: #{ex}"
-        self.error_count += 1
-        self.save
-        next
-      end
-
-      if client.last_response.status == 200
-        self.success_count += 1
-      else
-        self.full_errors << "Ticket number: #{row[@un_mapper['number']]} Import Error: #{result}"
-        self.error_count += 1
-      end
-      self.save
-
-    end
-
-    puts "Success: #{success_count}"
-    puts "Error: #{error_count}"
-    self.save
-
   end
 
 
   def run_invoice_import
-    host = 'repairshopr.co' if staging_run?
-    client = TroysAPIClient.new(subdomain, api_key, platform: platform, host: host)
-    records = JSON.parse(data)
-
-    self.update(record_count: (rows_to_process || records.size-1))
-    self.error_count = 0
-    self.success_count = 0
-    self.full_errors = []
-
-    @un_mapper = {}
-    records.first.each do |r|
-      @un_mapper[r[1]] = r[0]
+    process_for('Invoice', 'number') do |row|
+      created_at = Time.strptime(row[@un_mapper['date']],time_mapping) rescue Time.now
+      invoice = build_invoice_hash(row,created_at)
+      result = client.create_invoice invoice
     end
-
-    records[0..(rows_to_process || -1)].each_with_index do |row,index|
-      next if index == 0
-
-      begin
-
-        created_at = Time.strptime(row[@un_mapper['date']],time_mapping) rescue Time.now
-        invoice = build_invoice_hash(row,created_at)
-        result = client.create_invoice invoice
-        sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
-      rescue => ex
-        self.full_errors << "Invoice number: #{row[@un_mapper['number']]} Exception from Job: #{ex}"
-        self.error_count += 1
-        self.save
-        next
-      end
-
-      if client.last_response.status == 200
-        self.success_count += 1
-      else
-        self.full_errors << "Invoice number: #{row[@un_mapper['number']]} Import Error: #{result}"
-        self.error_count += 1
-      end
-      self.save
-
-    end
-
-    puts "Success: #{success_count}"
-    puts "Error: #{error_count}"
-    self.save
-
   end
 
   def run_asset_import
+    process_for('Asset', 'name') do |row|
+      asset = build_asset_hash(row)
+      result = client.create_or_update('customer_assets', asset)
+    end
+  end
+
+  def client(reload = false)
+    if @client.nil? || reload
+      @client = get_client
+    end
+
+    @client
+  end
+
+  def get_client
     host = 'repairshopr.co' if staging_run?
-    client = TroysAPIClient.new(subdomain, api_key, platform: platform, host: host)
+    TroysAPIClient.new(subdomain, api_key, platform: platform, host: host)
+  end
+
+  private
+
+  def process_for(resource_name, id_column)
     records = JSON.parse(data)
 
     self.update(record_count: (rows_to_process || records.size-1))
@@ -194,23 +138,21 @@ class Import < ActiveRecord::Base
 
     records[0..(rows_to_process || -1)].each_with_index do |row,index|
       next if index == 0
+      resource_identifier = row[@un_mapper[id_column]]
 
       begin
-
-        asset = build_asset_hash(row)
-        result = client.create_or_update('customer_assets', asset)
-        sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
+        result = yield row
       rescue => ex
-        self.full_errors << "Asset name: #{row[@un_mapper['name']]} Exception from Job: #{ex}"
+        self.full_errors << "#{resource_name} #{id_column}: #{resource_identifier} Exception from Job: #{ex}"
         self.error_count += 1
         self.save
         next
       end
 
-      if client.last_response.status == 200
+      if client.last_result.status == 200
         self.success_count += 1
       else
-        self.full_errors << "Asset name: #{row[@un_mapper['name']]} Import Error: #{result}"
+        self.full_errors << "#{resource_name} #{id_column}: #{resource_identifier} Import Error: #{result}"
         self.error_count += 1
       end
       self.save
@@ -220,10 +162,7 @@ class Import < ActiveRecord::Base
     puts "Success: #{success_count}"
     puts "Error: #{error_count}"
     self.save
-
   end
-
-  private
 
   def build_ticket_hash(row,created_at)
     ticket = {}
