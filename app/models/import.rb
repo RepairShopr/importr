@@ -11,8 +11,7 @@ class Import < ActiveRecord::Base
   validates :api_key, :subdomain, presence: true, if: ->() { data.present? }
   validate do
     # need valid credentials to include data, but don't spam RSYN for blank credentials.
-    # would need more persistence to avoid duplicate valid-calls, though an api_key could get de-authed
-    if data.present?
+    if data.present? && changes.slice(:data, :subdomain, :api_key).any?
       unless api_key.present? && subdomain.present? && get_client.authentic?
         self.errors.add(:api_key, 'can not be stored unless platform recognizes api_key')
       end
@@ -142,13 +141,11 @@ class Import < ActiveRecord::Base
     self.success_count = 0
     self.full_errors = []
 
-    @un_mapper = {}
-    records.first.each do |r|
-      @un_mapper[r[1]] = r[0]
-    end
+    column_mapping = records.first
+    @un_mapper = column_mapping.invert
 
-    records[0..(rows_to_process || -1)].each_with_index do |row,index|
-      next if index == 0
+    records.each_with_index do |row,index|
+      next if index == 0 # skip header row
       resource_identifier = row[@un_mapper[id_column]]
 
       begin
@@ -156,18 +153,26 @@ class Import < ActiveRecord::Base
       rescue => ex
         self.full_errors << "#{resource_name} #{id_column}: #{resource_identifier} Exception from Job: #{ex}"
         self.error_count += 1
-        self.save
+
+        # use update_columns to skip ActiveRecord redundant evaluation of megabytes in import.data
+        # could store import.data on a separate table instead and make this a more simple progress.save
+        self.update_columns(record_count: record_count, success_count: success_count, error_count: error_count, full_errors: full_errors)
         next
       end
 
-      if client.last_result.status == 200
+      if client.last_response.status == 200
         self.success_count += 1
       else
         self.full_errors << "#{resource_name} #{id_column}: #{resource_identifier} Import Error: #{result}"
         self.error_count += 1
+        self.record_count = self.success_count + self.error_count if self.error_count >= 15
       end
-      self.save
 
+      # use update_columns to skip ActiveRecord redundant evaluation of megabytes in import.data
+      # could store import.data on a separate table instead and make this a more simple progress.save
+      self.update_columns(record_count: record_count, success_count: success_count, error_count: error_count, full_errors: full_errors)
+
+      break if index > record_count # stop on index match rather than making two copies of the array
     end
 
     puts "Success: #{success_count}"
