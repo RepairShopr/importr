@@ -11,7 +11,6 @@ group :development do
   gem 'sqlite3'
   gem 'guard-livereload', '~> 2.4', require: false
   gem 'rerun'
-  gem 'pry'
   gem 'annotate'
 end
 
@@ -26,6 +25,7 @@ gem "bower-rails", "~> 0.9.2"
 gem 'simple_form'
 gem 'faraday'
 gem 'sidekiq'
+# gem 'sidekiq-unique-jobs', '~> 4.0.18'
 gem 'puma'
 
 # Use SCSS for stylesheets
@@ -57,6 +57,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+  gem 'pry'
+  gem 'pry-byebug'
 
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 2.0'

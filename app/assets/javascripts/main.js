@@ -1,3 +1,5 @@
+// Use Handsontable (0.14.1 https://docs.handsontable.com/0.15.0/tutorial-quick-start.html) to manage xlsx => json
+
 $(document).ready(function() {
     /** drop target **/
     var _target = document.getElementById('drop_zone');
@@ -131,9 +133,12 @@ $(document).ready(function() {
                 }
             },
             afterChange: function(changes, source) {
+              // changes [[row, prop, oldVal, newVal], ...]
+              // source in ["alter", "empty", "edit", "populateFromArray", "loadData", "autofill", "paste"]
                 console.log("just changed" +changes);
                 setupDataForForm();
                 if(Array.isArray(changes) === true && changes[0][0] == 0){
+                    // on edit/after change
                     console.log("in header row");
                     var fieldNewName = changes[0][3];
                     var theLabel = $(".field-label." + fieldNewName);
@@ -204,6 +209,7 @@ $(document).ready(function() {
         });
     }
 
+    // called from _onsheet and afterChange to push a JSON export of table to #import_data input field
     function setupDataForForm(){
         if(typeof(hotty) != "undefined"){
             $('#import_data').val(JSON.stringify(hotty.getData()));

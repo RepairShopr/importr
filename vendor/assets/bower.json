@@ -7,7 +7,8 @@
     "pikaday": "latest",
     "jszip": "latest",
     "alertify": "latest",
-    "handsontable": "latest",
+    "handsontable": "latest", // 0.14.1 of 0.38.1/2.0.0 https://github.com/handsontable/handsontable
+//    documentation starts at 0.15.0 https://docs.handsontable.com/0.15.0/tutorial-quick-start.html
     "fontawesome": "latest"
   }
 }
