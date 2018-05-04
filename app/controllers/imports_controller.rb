@@ -69,6 +69,7 @@ class ImportsController < ApplicationController
       else
         format.html { render :edit }
         format.json { render json: @import.errors, status: :unprocessable_entity }
+        format.js { }
       end
     end
   end

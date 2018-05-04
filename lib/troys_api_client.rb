@@ -28,6 +28,16 @@ class TroysAPIClient
     end
   end
 
+  def authentic?
+    authenticate
+    # 401 Unauthorized for invalid api_key
+    @last_response.status == 200
+  end
+
+  def authenticate
+    get "me"
+  end
+
   def customers
     get "customers.json"
   end

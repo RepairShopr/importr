@@ -53,7 +53,8 @@ $(function() {
             }
             $(".totals").text(data.record_count);
             $(".label-success.results").text(data.success_count);
-            $(".label-error.results").text(data.error_count);
+            $(".label-danger.results").text(data.error_count);
+
             console.log(data);
             console.log("still polling...");
             poll();

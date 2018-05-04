@@ -8,6 +8,17 @@ class Import < ActiveRecord::Base
   RESOURCE_TYPES = %w"ticket invoice asset"
   RESOURCE_COLLECTION = RESOURCE_TYPES.map {|i| [i.titleize,i]}
 
+  validates :api_key, :subdomain, presence: true, if: ->() { data.present? }
+  validate do
+    # need valid credentials to include data, but don't spam RSYN for blank credentials.
+    # would need more persistence to avoid duplicate valid-calls, though an api_key could get de-authed
+    if data.present?
+      unless api_key.present? && subdomain.present? && get_client.authentic?
+        self.errors.add(:api_key, 'can not be stored unless platform recognizes api_key')
+      end
+    end
+  end
+
   def fields_for_csv
     case resource_type
       when "ticket"

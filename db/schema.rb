@@ -13,6 +13,9 @@
 
 ActiveRecord::Schema.define(version: 20171116040610) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "imports", force: :cascade do |t|
     t.string   "api_key"
     t.string   "resource_type"
@@ -31,6 +34,6 @@ ActiveRecord::Schema.define(version: 20171116040610) do
     t.string   "platform"
   end
 
-  add_index "imports", ["uuid"], name: "index_imports_on_uuid"
+  add_index "imports", ["uuid"], name: "index_imports_on_uuid", using: :btree
 
 end
