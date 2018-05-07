@@ -1,0 +1,40 @@
+# Rails 4.1+ will merge ENV['DATABASE_URL'] with database.yml this allows us to add
+#   configuration on top of Heroku-managed DATABASE_URL
+#
+# Value precedence is database.yml:url > database.yml:<others> > ENV['DATABASE_URL']
+#   so setting `url: <%= ENV['DATABASE_URL'] %>` pushes DATABASE_URL over values here
+
+default: &default
+  #  adapter: postgresql
+  #  username: postgres
+  #  password: postgres
+  #  host: localhost
+  #  port: 5432
+  url: <%= ENV['DATABASE_URL'] %> # 'adapter://username:password@host:port/database' via .env comp Heroku
+  encoding: unicode
+  pool: 5
+  # timeout: 3000 # rails-side connection-timeout
+  # schema_search_path: "public,shared_extensions"
+  variables:
+    statement_timeout: <%= ENV['PG_STATEMENT_TIMEOUT'] %> # nil/blank ok. either stays default or uses 0-unlimited
+
+development: &development
+  <<: *default
+  database: importr_development # override this with DATABASE_URL in .env.development.local
+
+test: &test
+  <<: *default
+  database: importr_test # override this with DATABASE_URL in .env.test.local
+
+heroku_default: &heroku_default
+  url: <%= ENV['DATABASE_URL'] %> # 'adapter://username:password@host:port/database' via Heroku
+  # encoding: unicode
+  # pool:
+  # schema_search_path: "public,shared_extensions"
+  # prepared_statements: false
+  # statement_limit: 200
+  variables:
+    statement_timeout: <%= ENV['PG_STATEMENT_TIMEOUT'] %> # eg 5s. nil/blank ok. either stays default or uses 0-unlimited
+
+production:
+  <<: *heroku_default

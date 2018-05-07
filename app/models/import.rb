@@ -136,7 +136,7 @@ class Import < ActiveRecord::Base
   private
 
   def process_for(resource_name, id_column)
-    records = JSON.parse(data)
+    records = Oj.load(data)
 
     self.update(record_count: (rows_to_process || records.size-1))
     self.error_count = 0
