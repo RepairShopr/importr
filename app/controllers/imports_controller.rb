@@ -109,6 +109,8 @@ class ImportsController < ApplicationController
         # uuid
         # full_errors
         :staging_run, # ? previously never allowed ?
+        :errors_to_allow,
+        :match_on_asset_serial,
         )
   end
 end

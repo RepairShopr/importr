@@ -70,6 +70,8 @@
         <%= f.input :subdomain, input_html: {class: "bhv-blur-save"} %>
         <%= f.input :api_key, input_html: {class: "bhv-blur-save"} %>
         <%= f.input :rows_to_process, placeholder: "Leave blank for all" %>
+        <%= f.input :errors_to_allow, placeholder: "Leave blank for all" %>
+        <%= f.input :match_on_asset_serial %>
         <%= f.input :staging_run, label: false, inline_label: "Run against Staging instead of production" %>
         <%= f.input :mapping, as: :hidden, input_html: {value: @import.mapping} %>
         <%= f.input :data, as: :hidden, input_html: {value: @import.data} %>
