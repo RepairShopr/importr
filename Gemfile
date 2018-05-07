@@ -1,20 +1,19 @@
 source 'https://rubygems.org'
+# ruby "~> 2.5.1" # min "~> 2.3.7" which is not available on Heroku-18
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.10'
+gem 'rails', '4.2.10' # go to 5.1.6? pg_sequence bug is fixed in 5.1.4
 ruby '2.1.5'
+gem 'pg', '~> 0.18.4'
+
 group :development do
-# Use sqlite3 as the database for Active Record
-  gem 'sqlite3'
   gem 'guard-livereload', '~> 2.4', require: false
   gem 'rerun'
-  gem 'pry'
   gem 'annotate'
-end
 
-group :production do
-  gem 'pg'
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '~> 2.0'
 end
 
 gem 'sinatra'
@@ -24,6 +23,7 @@ gem "bower-rails", "~> 0.9.2"
 gem 'simple_form'
 gem 'faraday'
 gem 'sidekiq'
+# gem 'sidekiq-unique-jobs', '~> 4.0.18'
 gem 'puma'
 
 # Use SCSS for stylesheets
@@ -55,9 +55,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
-
-  # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 2.0'
+  gem 'pry'
+  gem 'pry-byebug'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'

@@ -69,6 +69,7 @@ class ImportsController < ApplicationController
       else
         format.html { render :edit }
         format.json { render json: @import.errors, status: :unprocessable_entity }
+        format.js { }
       end
     end
   end
@@ -91,6 +92,23 @@ class ImportsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def import_params
-    params.require(:import).permit(:api_key, :platform, :subdomain, :resource_type, :mapping, :rows_to_process, :record_count, :success_count, :error_count, :data)
+    params.require(:import).permit(
+        :api_key,
+        :platform,
+        :subdomain,
+        :resource_type,
+        :mapping,
+        :rows_to_process,
+        :record_count,
+        :success_count,
+        :error_count,
+        :data,
+        # id
+        # created_at
+        # updated_at
+        # uuid
+        # full_errors
+        :staging_run, # ? previously never allowed ?
+        )
   end
 end

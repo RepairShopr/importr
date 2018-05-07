@@ -21,4 +21,5 @@
 //= require dropsheet
 //= require handsontable
 //= require main
+//= require import
 //= require jquery_ujs

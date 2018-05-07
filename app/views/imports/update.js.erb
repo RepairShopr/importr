@@ -1,12 +1,25 @@
+var $bhv_submit = $(".bhv-submit");
+var $bhv_progress = $(".bhv-progress");
+clearTimeout($bhv_progress_timeout)
+
+<% if @import.errors.any? %>
+$bhv_progress.hide();
+$bhv_progress.text( "<%= safe_join @import.errors.full_messages %>" );
+$bhv_progress.removeClass("alert-success");
+$bhv_progress.addClass( "alert alert-danger" );
+$bhv_progress.fadeIn( "slow" );
+<% else %>
+
 <% if params[:commit] == "Process" %>
-$(".bhv-submit").addClass('disabled');
-$(".bhv-submit").val('Process (refresh to resubmit)');
+$bhv_submit.addClass('disabled');
+$bhv_submit.val('Process (refresh to resubmit)');
 <% end %>
-$( ".bhv-progress" ).hide();
-$( ".bhv-progress" ).text( "saved." );
-$( ".bhv-progress" ).addClass( "alert alert-success" );
-$( ".bhv-progress" ).fadeIn( "slow" );
-setTimeout(function() {
+$bhv_progress.hide();
+$bhv_progress.text( "saved." );
+$bhv_progress.removeClass("alert-danger");
+$bhv_progress.addClass( "alert alert-success" );
+$bhv_progress.fadeIn( "slow" );
+var $bhv_progress_timeout = setTimeout(function() {
     $( ".bhv-progress" ).fadeOut( "slow" );
 }, 5000);
-
+<% end %>

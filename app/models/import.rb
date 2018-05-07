@@ -1,4 +1,5 @@
 class Import < ActiveRecord::Base
+  self.primary_key = 'uuid'
 
   before_save :generate_uuid
 
@@ -7,6 +8,16 @@ class Import < ActiveRecord::Base
 
   RESOURCE_TYPES = %w"ticket invoice asset"
   RESOURCE_COLLECTION = RESOURCE_TYPES.map {|i| [i.titleize,i]}
+
+  validates :api_key, :subdomain, presence: true, if: ->() { data.present? }
+  validate do
+    # need valid credentials to include data, but don't spam RSYN for blank credentials.
+    if data.present? && changes.slice(:data, :subdomain, :api_key).any?
+      unless api_key.present? && subdomain.present? && get_client.authentic?
+        self.errors.add(:api_key, 'can not be stored unless platform recognizes api_key')
+      end
+    end
+  end
 
   def fields_for_csv
     case resource_type
@@ -81,117 +92,50 @@ class Import < ActiveRecord::Base
   end
 
   def run_ticket_import
-    client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
-    if staging_run?
-      puts "STAGING_RUN going to gsub"
-      client.base_url.gsub!(".com",".co")
+    process_for('Ticket', 'number') do |row|
+      created_at = Time.strptime(row[@un_mapper['created_at']],time_mapping)
+      comment = build_comment_hash(row,created_at)
+      ticket = build_ticket_hash(row,created_at)
+      ticket[:comments_attributes] = [comment]
+      result = client.create_ticket ticket
+      sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
+      result
     end
-    records = JSON.parse(data)
-
-    self.update(record_count: (rows_to_process || records.size-1))
-    self.error_count = 0
-    self.success_count = 0
-    self.full_errors = []
-
-    @un_mapper = {}
-    records.first.each do |r|
-      @un_mapper[r[1]] = r[0]
-    end
-
-    records[0..(rows_to_process || -1)].each_with_index do |row,index|
-      next if index == 0
-
-      begin
-
-        created_at = Time.strptime(row[@un_mapper['created_at']],time_mapping)
-        comment = build_comment_hash(row,created_at)
-        ticket = build_ticket_hash(row,created_at)
-        ticket[:comments_attributes] = [comment]
-        result = client.create_ticket ticket
-        sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
-      rescue => ex
-        self.full_errors << "Ticket number: #{row[@un_mapper['number']]} Exception from Job: #{ex}"
-        self.error_count += 1
-        self.save
-        next
-      end
-
-      if result.status == 200
-        self.success_count += 1
-      else
-        self.full_errors << "Ticket number: #{row[@un_mapper['number']]} Import Error: #{result.body}"
-        self.error_count += 1
-      end
-      self.save
-
-    end
-
-    puts "Success: #{success_count}"
-    puts "Error: #{error_count}"
-    self.save
-
   end
 
 
   def run_invoice_import
-    client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
-    if staging_run?
-      puts "STAGING_RUN going to gsub"
-      client.base_url.gsub!(".com",".co")
+    process_for('Invoice', 'number') do |row|
+      created_at = Time.strptime(row[@un_mapper['date']],time_mapping) rescue Time.now
+      invoice = build_invoice_hash(row,created_at)
+      result = client.create_invoice invoice
     end
-    records = JSON.parse(data)
-
-    self.update(record_count: (rows_to_process || records.size-1))
-    self.error_count = 0
-    self.success_count = 0
-    self.full_errors = []
-
-    @un_mapper = {}
-    records.first.each do |r|
-      @un_mapper[r[1]] = r[0]
-    end
-
-    records[0..(rows_to_process || -1)].each_with_index do |row,index|
-      next if index == 0
-
-      begin
-
-        created_at = Time.strptime(row[@un_mapper['date']],time_mapping) rescue Time.now
-        invoice = build_invoice_hash(row,created_at)
-        result = client.create_invoice invoice
-        sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
-      rescue => ex
-        self.full_errors << "Invoice number: #{row[@un_mapper['number']]} Exception from Job: #{ex}"
-        self.error_count += 1
-        self.save
-        next
-      end
-
-      if result.status == 200
-        self.success_count += 1
-      else
-        self.full_errors << "Invoice number: #{row[@un_mapper['number']]} Import Error: #{result.body}"
-        self.error_count += 1
-      end
-      self.save
-
-    end
-
-    puts "Success: #{success_count}"
-    puts "Error: #{error_count}"
-    self.save
-
   end
 
   def run_asset_import
-    client = TroysAPIClient.new(subdomain,api_key)
-    client.base_url = Rails.env.development? ? "http://#{subdomain}.lvh.me:3000" : "https://#{subdomain}.#{platform == 'syncro' ? 'syncromsp' : 'repairshopr'}.com"
-    if staging_run?
-      puts "STAGING_RUN going to gsub"
-      client.base_url.gsub!(".com",".co")
+    process_for('Asset', 'name') do |row|
+      # row['asset_type_name'] = 'Computer' # hack for testing extremely large imports
+      asset = build_asset_hash(row)
+      result = client.create_or_update('customer_assets', asset)
     end
+  end
+
+  def client(reload = false)
+    if @client.nil? || reload
+      @client = get_client
+    end
+
+    @client
+  end
+
+  def get_client
+    host = 'repairshopr.co' if staging_run?
+    TroysAPIClient.new(subdomain, api_key, platform: platform, host: host)
+  end
+
+  private
+
+  def process_for(resource_name, id_column)
     records = JSON.parse(data)
 
     self.update(record_count: (rows_to_process || records.size-1))
@@ -199,43 +143,44 @@ class Import < ActiveRecord::Base
     self.success_count = 0
     self.full_errors = []
 
-    @un_mapper = {}
-    records.first.each do |r|
-      @un_mapper[r[1]] = r[0]
-    end
+    column_mapping = records.first
+    @un_mapper = column_mapping.invert
 
-    records[0..(rows_to_process || -1)].each_with_index do |row,index|
-      next if index == 0
+    records.each_with_index do |row,index|
+      next if index == 0 # skip header row
+      resource_identifier = row[@un_mapper[id_column]]
 
       begin
-
-        asset = build_asset_hash(row)
-        result = client.create_or_update('customer_assets', asset)
-        sleep 0.45                                  #awesome rate limiter! you might need to re-read this to grok it..
+        result = yield row
       rescue => ex
-        self.full_errors << "Asset name: #{row[@un_mapper['name']]} Exception from Job: #{ex}"
+        self.full_errors << "#{resource_name} #{id_column}: #{resource_identifier} Exception from Job: #{ex}"
         self.error_count += 1
-        self.save
+
+        # use update_columns to skip ActiveRecord redundant evaluation of megabytes in import.data
+        # could store import.data on a separate table instead and make this a more simple progress.save
+        self.update_columns(record_count: record_count, success_count: success_count, error_count: error_count, full_errors: full_errors)
         next
       end
 
-      if result.status == 200
+      if client.last_response.status == 200
         self.success_count += 1
       else
-        self.full_errors << "Asset name: #{row[@un_mapper['name']]} Import Error: #{result.body}"
+        self.full_errors << "#{resource_name} #{id_column}: #{resource_identifier} Import Error: #{result}"
         self.error_count += 1
+        self.record_count = self.success_count + self.error_count if self.error_count >= 15
       end
-      self.save
 
+      # use update_columns to skip ActiveRecord redundant evaluation of megabytes in import.data
+      # could store import.data on a separate table instead and make this a more simple progress.save
+      self.update_columns(record_count: record_count, success_count: success_count, error_count: error_count, full_errors: full_errors)
+
+      break if index > record_count # stop on index match rather than making two copies of the array
     end
 
     puts "Success: #{success_count}"
     puts "Error: #{error_count}"
     self.save
-
   end
-
-  private
 
   def build_ticket_hash(row,created_at)
     ticket = {}

@@ -1,62 +1,81 @@
 class TroysAPIClient
 
-  attr_accessor :subdomain, :api_key, :base_url, :api_version
+  attr_accessor :subdomain, :api_key, :protocol, :platform, :host,
+                :base_url, :api_version
+  attr_accessor :last_response
 
-  def initialize subdomain,api_key
+  def initialize(subdomain, api_key, platform: 'repairshopr', host: nil, ssl: nil)
     @subdomain = subdomain
     @api_key = api_key
+
+    @protocol = ssl if ssl.is_a?(String)
+    @protocol ||= (Rails.env.development? ? 'http' : 'https') if ssl.nil?
+    @protocol ||= ssl ? 'https' : 'http'
+
+    @platform = %w[repairshopr syncro].detect {|k| k == platform } or raise "Invalid platform '#{platform}'"
+    @host = host || determine_host
+    @base_url = "#{@protocol}://#{@subdomain}.#{@host}"
+
     @api_version = "/api/v1"
   end
 
-  def base_url
-    @base_url ||= "http://#{subdomain}.lvh.me:3000" if Rails.env.development?
-    @base_url ||= "https://#{subdomain}.repairshopr.com"
+  def determine_host
+    return 'lvh.me:3000' if Rails.env.development?
+    if platform == 'syncro'
+      'syncromsp.com'
+    else
+      'repairshopr.com'
+    end
+  end
+
+  def authentic?
+    authenticate
+    # 401 Unauthorized for invalid api_key
+    @last_response.status == 200
+  end
+
+  def authenticate
+    get "me"
   end
 
   def customers
-    response = Faraday.get "#{base_url}/#{@api_version}/customers.json?api_key=#{@api_key}"
-    JSON.parse response.body
+    get "customers.json"
+  end
+
+  def search_customers(query)
+    get "customers.json", query: query
   end
 
   def autocomplete query
-    response = Faraday.get "#{base_url}/#{@api_version}/customers/autocomplete.json?api_key=#{@api_key}&query=#{query}"
-    JSON.parse response.body
+    get "customers/autocomplete.json", query: query
   end
 
   def invoices
-    response = Faraday.get "#{base_url}/#{@api_version}/invoices.json?api_key=#{@api_key}"
-    JSON.parse response.body
+    get "invoices.json"
   end
 
   def tickets
-    response = Faraday.get "#{base_url}/#{@api_version}/tickets.json?api_key=#{@api_key}"
-    JSON.parse response.body
+    get "tickets.json"
   end
 
   def vendors
-    response = Faraday.get "#{base_url}/#{@api_version}/vendors.json?api_key=#{@api_key}"
-    JSON.parse response.body
+    get "vendors.json"
   end
 
   def schedules
-    response = Faraday.get "#{base_url}/#{@api_version}/schedules.json?api_key=#{@api_key}"
-    JSON.parse response.body
+    get "schedules.json"
   end
 
   def create_customer params
-    setup_connection
-    response = @conn.post "#{api_version}/customers.json?api_key=#{@api_key}", params
+    post "customers.json", params
   end
 
   def create_vendor params
-    setup_connection
-    response = @conn.post "#{api_version}/vendors.json?api_key=#{@api_key}", params
+    post "vendors.json", params
   end
 
   def create_schedule params
-    setup_connection
-    response = @conn.post "#{api_version}/schedules.json?api_key=#{@api_key}", params
-    JSON.parse response.body
+    post "schedules.json", params
   end
 
   def demo_customer
@@ -70,37 +89,19 @@ class TroysAPIClient
 
 
   def create_invoice params
-    setup_connection
-    response = @conn.post "#{@api_version}/invoices.json?api_key=#{@api_key}", params
+    post "invoices.json", params
   end
 
   def create_ticket params
-    setup_connection
-    response = @conn.post "#{@api_version}/tickets.json?api_key=#{@api_key}", params
+    post "tickets.json", params
   end
 
   def create_comment params
-    setup_connection
-    response = @conn.post "#{@api_version}/tickets/#{params[:number]}/comment.json?api_key=#{@api_key}", params
+    post "tickets/#{params[:number]}/comment.json", params
   end
 
   def create_asset params
-    setup_connection
-    response = @conn.post "#{@api_version}/customer_assets.json?api_key=#{@api_key}", params
-  end
-
-  def create_or_update type, params
-    setup_connection
-    id = params.delete(:id)
-    url = [@api_version, type, id].compact.join('/')
-    payload = params
-    payload[:api_key] = @api_key
-    payload[:format] = 'json'
-    if id.present?
-      @conn.put(url, params)
-    else
-      @conn.post(url, params)
-    end
+    post "customer_assets.json", params
   end
 
   def demo_invoice
@@ -113,11 +114,47 @@ class TroysAPIClient
     create_invoice new_invoice
   end
 
+  # Framework/Foundational helpers
   def setup_connection
-    @conn = Faraday.new(:url => "#{base_url}", :ssl => {:verify => false} ) do |faraday|
+    @conn = Faraday.new(
+        url: "#{base_url}/#{api_version}",
+        params: {api_key: api_key},
+        ) do |faraday|
       faraday.request  :url_encoded             # form-encode POST params
       faraday.response :logger                  # log requests to STDOUT
       faraday.adapter  Faraday.default_adapter  # make requests with Net::HTTP
     end
   end
+
+  def get(path, params = {})
+    setup_connection
+    @last_response = @conn.get(path, params)
+    JSON.parse @last_response.body
+  end
+
+  def post(path, params = {})
+    setup_connection
+    @last_response = @conn.post(path, params)
+    JSON.parse @last_response.body
+  end
+
+  # eg `client.create_or_update('customer_assets', asset)` does not manage pluralization of route
+  def create_or_update type, params
+    setup_connection
+
+    id = params.delete(:id)
+    url = [type, id].compact.join('/')
+
+    payload = params
+    payload[:format] = 'json'
+
+    @last_response = if id.present?
+      @conn.put(url, params)
+    else
+      @conn.post(url, params)
+    end
+
+    JSON.parse @last_response.body
+  end
+
 end
