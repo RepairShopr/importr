@@ -117,7 +117,32 @@ class Import < ActiveRecord::Base
       # row['asset_type_name'] = 'Computer' # hack for testing extremely large imports
       asset = build_asset_hash(row)
       result = client.create_or_update('customer_assets', asset)
+      result = process_asset_serial_conflict(result, asset)
     end
+  end
+
+  # Hack out a matcher to silence 'Asset serial has already been taken' errors for import re-runs
+  def process_asset_serial_conflict(result, asset)
+    return result if result['success']
+
+    maybe_missing_asset_id = result['message'].reject{|m| m == 'Asset serial has already been taken'}.none?
+    return result unless maybe_missing_asset_id
+
+    matcher_client = get_client # another instance because of side-effects
+    conflict_assets = matcher_client.get('customer_assets', query: asset[:asset_serial])
+    return result unless conflict_assets['assets'] && conflict_assets['assets'].count == 1
+
+    if false # && matching # maybe this is a solution... seems risky
+      conflict = conflict_assets['assets'].first
+
+      # I tried comparing all of `asset`s values to `conflict`s values, but the keys don't match (eg customer_email)
+
+      # pretend the import data included id to maintain interfaces
+      asset[:id] = conflict['id']
+      return client.create_or_update('customer_assets', asset)
+    end
+
+    result
   end
 
   def client(reload = false)
