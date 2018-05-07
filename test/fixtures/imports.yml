@@ -33,6 +33,7 @@ one:
   record_count: 1
   success_count: 1
   error_count: 1
+  uuid: af1fe071-9df7-4c8b-8977-3d7a0b36eb84
 
 two:
   api_key: MyString
@@ -41,3 +42,4 @@ two:
   record_count: 1
   success_count: 1
   error_count: 1
+  uuid: fed8e385-2d2d-4e29-a833-c41eb72c92da

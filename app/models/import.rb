@@ -1,4 +1,5 @@
 class Import < ActiveRecord::Base
+  self.primary_key = 'uuid'
 
   before_save :generate_uuid
 
@@ -113,6 +114,7 @@ class Import < ActiveRecord::Base
 
   def run_asset_import
     process_for('Asset', 'name') do |row|
+      # row['asset_type_name'] = 'Computer' # hack for testing extremely large imports
       asset = build_asset_hash(row)
       result = client.create_or_update('customer_assets', asset)
     end

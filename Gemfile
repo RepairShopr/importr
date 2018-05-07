@@ -3,19 +3,17 @@ source 'https://rubygems.org'
 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.10'
+gem 'rails', '4.2.10' # go to 5.1.6? pg_sequence bug is fixed in 5.1.4
 ruby '2.1.5'
+gem 'pg', '~> 0.18.4'
 
 group :development do
-# Use sqlite3 as the database for Active Record
-  gem 'sqlite3'
   gem 'guard-livereload', '~> 2.4', require: false
   gem 'rerun'
   gem 'annotate'
-end
 
-group :production do
-  gem 'pg'
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '~> 2.0'
 end
 
 gem 'sinatra'
@@ -59,9 +57,6 @@ group :development, :test do
   gem 'byebug'
   gem 'pry'
   gem 'pry-byebug'
-
-  # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 2.0'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'

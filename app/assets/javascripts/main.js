@@ -1,4 +1,5 @@
 // Use Handsontable (0.14.1 https://docs.handsontable.com/0.15.0/tutorial-quick-start.html) to manage xlsx => json
+// TODO: update handsontable to 0.38.1 or 2.0.0 (and update bower to yarn etc)
 
 $(document).ready(function() {
     /** drop target **/
