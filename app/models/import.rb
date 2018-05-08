@@ -117,7 +117,28 @@ class Import < ActiveRecord::Base
       # row['asset_type_name'] = 'Computer' # hack for testing extremely large imports
       asset = build_asset_hash(row)
       result = client.create_or_update('customer_assets', asset)
+      result = process_asset_serial_conflict(result, asset)
     end
+  end
+
+  # Hack out a matcher to silence 'Asset serial has already been taken' errors for import re-runs
+  def process_asset_serial_conflict(result, asset)
+    return result unless self.match_on_asset_serial
+    return result if result['success']
+
+    maybe_missing_asset_id = result['message'].reject{|m| m == 'Asset serial has already been taken'}.none?
+    return result unless maybe_missing_asset_id
+
+    matcher_client = get_client # another instance because of side-effects
+    conflict_assets = matcher_client.get('customer_assets', query: asset[:asset_serial])
+    return result unless conflict_assets['assets'] && conflict_assets['assets'].count == 1
+
+    conflict = conflict_assets['assets'].first
+    # I tried comparing all of `asset`s values to `conflict`s values to confirm, but the keys don't match (eg customer_email)
+
+    # pretend the import data included id to maintain interfaces
+    asset[:id] = conflict['id']
+    client.create_or_update('customer_assets', asset)
   end
 
   def client(reload = false)
@@ -139,6 +160,7 @@ class Import < ActiveRecord::Base
     records = Oj.load(data)
 
     self.update(record_count: (rows_to_process || records.size-1))
+    error_stop = errors_to_allow.to_i > 0 ? errors_to_allow : 100_000
     self.error_count = 0
     self.success_count = 0
     self.full_errors = []
@@ -167,14 +189,14 @@ class Import < ActiveRecord::Base
       else
         self.full_errors << "#{resource_name} #{id_column}: #{resource_identifier} Import Error: #{result}"
         self.error_count += 1
-        self.record_count = self.success_count + self.error_count if self.error_count >= 15
+        self.record_count = self.success_count + self.error_count if self.error_count >= error_stop
       end
 
       # use update_columns to skip ActiveRecord redundant evaluation of megabytes in import.data
       # could store import.data on a separate table instead and make this a more simple progress.save
       self.update_columns(record_count: record_count, success_count: success_count, error_count: error_count, full_errors: full_errors)
 
-      break if index > record_count # stop on index match rather than making two copies of the array
+      break if index >= record_count # stop on index match rather than making two copies of the array
     end
 
     puts "Success: #{success_count}"
@@ -264,22 +286,24 @@ end
 #
 # Table name: imports
 #
-#  id              :integer          not null, primary key
-#  api_key         :string
-#  resource_type   :string
-#  mapping         :text
-#  record_count    :integer
-#  success_count   :integer
-#  error_count     :integer
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
-#  uuid            :string
-#  subdomain       :string
-#  data            :text
-#  full_errors     :text
-#  rows_to_process :integer
-#  staging_run     :boolean          default(FALSE)
-#  platform        :string
+#  id                    :integer          not null
+#  api_key               :string
+#  resource_type         :string
+#  mapping               :text
+#  record_count          :integer
+#  success_count         :integer
+#  error_count           :integer
+#  created_at            :datetime         not null
+#  updated_at            :datetime         not null
+#  uuid                  :string           primary key
+#  subdomain             :string
+#  data                  :text
+#  full_errors           :text
+#  rows_to_process       :integer
+#  staging_run           :boolean          default(FALSE)
+#  platform              :string
+#  errors_to_allow       :integer
+#  match_on_asset_serial :boolean          default(FALSE), not null
 #
 # Indexes
 #

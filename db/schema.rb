@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171116040610) do
+ActiveRecord::Schema.define(version: 20180507195454) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,15 +23,17 @@ ActiveRecord::Schema.define(version: 20171116040610) do
     t.integer  "record_count"
     t.integer  "success_count"
     t.integer  "error_count"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
     t.string   "uuid"
     t.string   "subdomain"
     t.text     "data"
     t.text     "full_errors"
     t.integer  "rows_to_process"
-    t.boolean  "staging_run",     default: false
+    t.boolean  "staging_run",           default: false
     t.string   "platform"
+    t.integer  "errors_to_allow"
+    t.boolean  "match_on_asset_serial", default: false, null: false
   end
 
   add_index "imports", ["uuid"], name: "index_imports_on_uuid", using: :btree
