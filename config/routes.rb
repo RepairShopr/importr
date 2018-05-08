@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     end
     member do
       get :status_poll
+      post :cancel
     end
   end
 

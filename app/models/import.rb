@@ -9,6 +9,8 @@ class Import < ActiveRecord::Base
   RESOURCE_TYPES = %w"ticket invoice asset"
   RESOURCE_COLLECTION = RESOURCE_TYPES.map {|i| [i.titleize,i]}
 
+  attr_accessor :abort_key
+
   validates :api_key, :subdomain, presence: true, if: ->() { data.present? }
   validate do
     # need valid credentials to include data, but don't spam RSYN for blank credentials.
@@ -124,9 +126,9 @@ class Import < ActiveRecord::Base
   # Hack out a matcher to silence 'Asset serial has already been taken' errors for import re-runs
   def process_asset_serial_conflict(result, asset)
     return result unless self.match_on_asset_serial
-    return result if result['success']
+    return result if result['success'] || result['message'].nil? # successful or unexpected response
 
-    maybe_missing_asset_id = result['message'].reject{|m| m == 'Asset serial has already been taken'}.none?
+    maybe_missing_asset_id = Array(result['message']).reject{|m| m == 'Asset serial has already been taken'}.none?
     return result unless maybe_missing_asset_id
 
     matcher_client = get_client # another instance because of side-effects
@@ -170,6 +172,11 @@ class Import < ActiveRecord::Base
 
     records.each_with_index do |row,index|
       next if index == 0 # skip header row
+      if abort_key && Sidekiq.redis{|c| c.get(abort_key) == 'abort'}
+        self.record_count = self.success_count + self.error_count
+        break
+      end
+
       resource_identifier = row[@un_mapper[id_column]]
 
       begin
@@ -181,7 +188,12 @@ class Import < ActiveRecord::Base
         # use update_columns to skip ActiveRecord redundant evaluation of megabytes in import.data
         # could store import.data on a separate table instead and make this a more simple progress.save
         self.update_columns(record_count: record_count, success_count: success_count, error_count: error_count, full_errors: full_errors)
-        next
+
+        if self.error_count >= error_stop
+          raise
+        else
+          next
+        end
       end
 
       if client.last_response.status == 200

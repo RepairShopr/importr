@@ -1,5 +1,5 @@
 class ImportsController < ApplicationController
-  before_action :set_import, only: [:show, :edit, :update, :destroy, :status_poll]
+  before_action :set_import, only: [:show, :edit, :update, :destroy, :status_poll, :cancel]
   protect_from_forgery :except => :sheetjsw
 
   # GET /imports
@@ -82,6 +82,11 @@ class ImportsController < ApplicationController
       format.html { redirect_to imports_url, notice: 'Import was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+
+  def cancel
+    ImportWorker.abort(@import.uuid)
+    redirect_to @import, notice: 'Import should cancel in the next 2 minutes'
   end
 
   private
