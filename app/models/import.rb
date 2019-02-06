@@ -227,6 +227,7 @@ class Import < ActiveRecord::Base
     ticket[:status] = 'Resolved'
     ticket[:created_at] = created_at
     ticket[:updated_at] = created_at
+    ticket[:location_id] = row[@un_mapper['location_id']]
     ticket.compact!
     ticket
   end
@@ -252,6 +253,7 @@ class Import < ActiveRecord::Base
     invoice[:paid] = true
     invoice[:date_received] = created_at
     invoice[:number] = row[@un_mapper['number']]
+    invoice[:location_id] = row[@un_mapper['location_id']]
     invoice[:line_items] = [
         {item: 'Legacy', name: (row[@un_mapper['optional_line_item_name']].presence || 'Invoice Line Item'),
          cost: 0.0,
