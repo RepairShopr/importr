@@ -20,7 +20,7 @@ class TroysAPIClient
   end
 
   def determine_host
-    return 'lvh.me:3000' if Rails.env.development?
+    return ENV['RSYN_HOST'] if Rails.env.development?
     if platform == 'syncro'
       'syncromsp.com'
     else

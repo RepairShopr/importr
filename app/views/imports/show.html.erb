@@ -33,7 +33,7 @@
     <hr>
     <!--######################### RESOURCE TYPE DROPDOWN #########################-->
 
-    <%= simple_form_for @import, url: import_path(@import.uuid) do |f| %>
+    <%= simple_form_for @import, url: import_path(@import.uuid), html: { id: 'edit_import_resource' } do |f| %>
         <%= f.input :resource_type, as: :select, collection: Import::RESOURCE_COLLECTION %>
     <% end %>
     <script>
