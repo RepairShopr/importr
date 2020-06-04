@@ -25,34 +25,34 @@ class ImportsControllerTest < ActionController::TestCase
   end
 
   test "should create import" do
-    assert_difference('Import.count') { post :create, import: import_params }
+    assert_difference('Import.count') { post :create, params: { import: import_params } }
     assert_redirected_to import_path(assigns(:import))
   end
 
   test "should show import" do
-    get :show, id: @import
+    get :show, params: { id: @import }
     assert_response :success
   end
 
   test "should get edit" do
-    get :edit, id: @import
+    get :edit, params: { id: @import }
     assert_response :success
   end
 
   test "should destroy import" do
-    assert_difference('Import.count', -1) { delete :destroy, id: @import }
+    assert_difference('Import.count', -1) { delete :destroy, params: { id: @import } }
     assert_redirected_to imports_path
   end
 
   test "should update import" do
-    patch :update, id: @import, import: import_params
+    patch :update, params: { id: @import, import: import_params }
     assert_equal 0, ImportWorker.jobs.size
     assert_redirected_to import_path(assigns(:import))
   end
 
   test "#update should call ImportWorker if commit   parameter is 'Process'" do
     assert_difference('ImportWorker.jobs.size', 1) do
-      patch :update, id: @import, commit: 'Process', import: import_params
+      patch :update, params: { id: @import, commit: 'Process', import: import_params }
     end
     assert_redirected_to import_path(assigns(:import))
   end
@@ -61,7 +61,7 @@ class ImportsControllerTest < ActionController::TestCase
     mock = Minitest::Mock.new
     mock.expect(:call, nil, [@import.uuid])
 
-    ImportWorker.stub(:abort, mock) { post :cancel, id: @import }
+    ImportWorker.stub(:abort, mock) { post :cancel, params: { id: @import } }
 
     mock.verify
     assert_redirected_to @import
