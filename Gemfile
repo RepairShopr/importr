@@ -1,11 +1,11 @@
 source 'https://rubygems.org'
-# ruby "~> 2.5.1" # min "~> 2.3.7" which is not available on Heroku-18
+
+ruby '2.5.7'
+
+gem 'rails', '5.0.0'
+
 gem 'dotenv-rails', require: 'dotenv/rails-now', groups: [:development, :test]
 
-
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '< 5.0' # go to 5.1.6? pg_sequence bug is fixed in 5.1.4
-ruby '2.5.7'
 gem 'pg', '~> 0.18.4'
 gem 'oj', '~> 2.18.5'
 gem 'rollbar', '~> 2.15.6'
@@ -63,4 +63,8 @@ group :development, :test do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring', '~> 1.7.2'
+end
+
+group :test do
+  gem 'rails-controller-testing'
 end

@@ -1,4 +1,4 @@
-class Import < ActiveRecord::Base
+class Import < ApplicationRecord
   self.primary_key = 'uuid'
 
   before_save :generate_uuid
