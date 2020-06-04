@@ -2,11 +2,11 @@ source 'https://rubygems.org'
 
 ruby '2.5.7'
 
-gem 'rails', '5.0.0'
-
 gem 'dotenv-rails', require: 'dotenv/rails-now', groups: [:development, :test]
 
-gem 'pg', '~> 0.18.4'
+gem 'rails', '5.1'
+
+gem 'pg', '~> 0.21'
 gem 'oj', '~> 2.18.5'
 gem 'rollbar', '~> 2.15.6'
 
@@ -16,7 +16,7 @@ group :development do
   gem 'annotate'
 
   # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 2.0'
+  gem 'web-console'
 end
 
 gem 'sinatra'
@@ -30,11 +30,11 @@ gem 'sidekiq'
 gem 'puma'
 
 # Use SCSS for stylesheets
-gem 'sass-rails', '~> 5.0'
+gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
-gem 'coffee-rails', '~> 4.1.0'
+gem 'coffee-rails'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
 
@@ -42,7 +42,7 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'jquery-rails'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.0'
+gem 'jbuilder'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 
