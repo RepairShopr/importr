@@ -1,10 +1,17 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'sidekiq/testing'
+require 'minitest/mock'
 
 class ImportsControllerTest < ActionController::TestCase
   setup do
+    Sidekiq::Testing.fake!
     @import = imports(:one)
+  end
+
+  teardown do
+    Sidekiq::Worker.clear_all
   end
 
   test "should get index" do
@@ -39,7 +46,25 @@ class ImportsControllerTest < ActionController::TestCase
 
   test "should update import" do
     patch :update, id: @import, import: import_params
+    assert_equal 0, ImportWorker.jobs.size
     assert_redirected_to import_path(assigns(:import))
+  end
+
+  test "#update should call ImportWorker if commit   parameter is 'Process'" do
+    assert_difference('ImportWorker.jobs.size', 1) do
+      patch :update, id: @import, commit: 'Process', import: import_params
+    end
+    assert_redirected_to import_path(assigns(:import))
+  end
+
+  test '#cancel' do
+    mock = Minitest::Mock.new
+    mock.expect(:call, nil, [@import.uuid])
+
+    ImportWorker.stub(:abort, mock) { post :cancel, id: @import }
+
+    mock.verify
+    assert_redirected_to @import
   end
 
   def import_params
