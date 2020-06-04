@@ -34,7 +34,7 @@ one:
   mapping: MyText
   record_count: 1
   success_count: 1
-  error_count: 1
+  error_count: 0
   uuid: af1fe071-9df7-4c8b-8977-3d7a0b36eb84
 
 two:

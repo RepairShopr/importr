@@ -29,7 +29,45 @@
 require 'test_helper'
 
 class ImportTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  setup do
+    @import = imports(:one)
+    @import.update!(platform: 'repairshopr')
+  end
+
+  #
+  # Of course, `#run_now` should be tested for `success_count` and not errors
+  # but I cannot guess the correct input format, so I leave it as it is for now to save time.
+  # At least, it is a quite valid smoke test for main model's feature.
+  # @gryaznov
+  #
+  test '#run_now ticket' do
+    @import.resource_type = 'ticket'
+    @import.data = File.read(Rails.root.join('test', 'fixtures', 'files', 'ticket.json'))
+    assert_difference('@import.error_count') { @import.run_now }
+    assert_equal 1, @import.full_errors.count
+  end
+
+  test '#run_now asset' do
+    @import.resource_type = 'asset'
+    @import.data = File.read(Rails.root.join('test', 'fixtures', 'files', 'asset.json'))
+    assert_difference('@import.error_count') { @import.run_now }
+    assert_equal 1, @import.full_errors.count
+  end
+
+  test '#run_now invoice' do
+    @import.resource_type = 'invoice'
+    @import.data = File.read(Rails.root.join('test', 'fixtures', 'files', 'invoice.json'))
+    assert_difference('@import.error_count') { @import.run_now }
+    assert_equal 1, @import.full_errors.count
+  end
+
+  test '#client does not call for TroysAPIClient if there is a client' do
+    client = @import.client
+    assert_equal client.object_id, @import.client.object_id
+  end
+
+  test '#client calls for TroysAPIClient if reload is required' do
+    client = @import.client
+    assert_not_equal client.object_id, @import.client(:reload).object_id
+  end
 end

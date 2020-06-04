@@ -1,0 +1,16 @@
+[
+    {
+        "asset_serial": "999999",
+        "name": "Dell Laptop 1",
+        "customer_email": "them@aol.com",
+        "asset_type_name": "Computer",
+        "properties": "Model:Dell"
+    },
+    {
+        "asset_serial": "888888",
+        "name": "Acer Laptop 2",
+        "customer_email": "another@gmail.com",
+        "asset_type_name": "Computer",
+        "properties": "Model:Acer;Operating System:Windows XP"
+    }
+]
