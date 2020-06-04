@@ -105,7 +105,6 @@ class Import < ActiveRecord::Base
     end
   end
 
-
   def run_invoice_import
     process_for('Invoice', 'number') do |row|
       created_at = Time.strptime(row[@un_mapper['date']],time_mapping) rescue Time.now
