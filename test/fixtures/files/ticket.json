@@ -1,0 +1,20 @@
+[
+    {
+        "number": "8888",
+        "created_at": "12/1/14",
+        "subject": "first test of csv importer",
+        "body": "This is a big comment body!",
+        "tech": "Troy",
+        "problem_type": "Virus",
+        "customer_email": "someone@aol.com"
+    },
+    {
+        "number": "8889",
+        "created_at": "1/6/15",
+        "subject": "second test, in 2015",
+        "body": "This is a small test of a comment body, here we go!",
+        "tech": "Troy",
+        "problem_type": "Virus",
+        "customer_email": "another@gmail.com"
+    }
+]

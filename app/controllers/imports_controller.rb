@@ -4,26 +4,21 @@ class ImportsController < ApplicationController
 
   # GET /imports
   # GET /imports.json
-  def index
+  def index; end
 
-  end
-
-  def sheetjsw
-
-  end
+  def sheetjsw; end
 
   # GET /imports/1
   # GET /imports/1.json
-  def show
-  end
+  def show; end
 
   def status_poll
     render json: {
-               success_count: @import.success_count.to_i,
-               record_count: @import.record_count.to_i,
-               error_count: @import.error_count.to_i,
-               full_errors: @import.full_errors
-           }
+      success_count: @import.success_count.to_i,
+      record_count: @import.record_count.to_i,
+      error_count: @import.error_count.to_i,
+      full_errors: @import.full_errors
+    }
   end
 
   # GET /imports/new
@@ -57,7 +52,7 @@ class ImportsController < ApplicationController
   def update
     respond_to do |format|
       if @import.mapping.present? && params[:import][:mapping].blank?
-        #lets just protect a tiny bit against nil'ing out the mapping on accidental blur submits..
+        # lets just protect a tiny bit against nil'ing out the mapping on accidental blur submits..
         params[:import][:mapping] = @import.mapping
       end
 

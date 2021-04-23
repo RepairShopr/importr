@@ -1,4 +1,4 @@
-class Import < ActiveRecord::Base
+class Import < ApplicationRecord
   self.primary_key = 'uuid'
 
   before_save :generate_uuid
@@ -104,7 +104,6 @@ class Import < ActiveRecord::Base
       result
     end
   end
-
 
   def run_invoice_import
     process_for('Invoice', 'number') do |row|
