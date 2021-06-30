@@ -30,6 +30,7 @@ gem 'sidekiq'
 gem 'puma'
 
 # Use SCSS for stylesheets
+# NOTE: dependency gem sass-rails => gem sassc => native `libsass` which may take minutes to compile
 gem 'sass-rails'
 # Use Uglifier as compressor for JavaScript assets
 gem 'uglifier', '>= 1.3.0'
