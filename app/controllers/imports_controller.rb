@@ -3,13 +3,11 @@ class ImportsController < ApplicationController
   protect_from_forgery :except => :sheetjsw
 
   # GET /imports
-  # GET /imports.json
   def index; end
 
   def sheetjsw; end
 
   # GET /imports/1
-  # GET /imports/1.json
   def show; end
 
   def status_poll
@@ -32,23 +30,19 @@ class ImportsController < ApplicationController
   end
 
   # POST /imports
-  # POST /imports.json
   def create
     @import = Import.new(import_params)
 
     respond_to do |format|
       if @import.save
         format.html { redirect_to @import, notice: 'Import was successfully created.' }
-        format.json { render :show, status: :created, location: @import }
       else
         format.html { render :new }
-        format.json { render json: @import.errors, status: :unprocessable_entity }
       end
     end
   end
 
   # PATCH/PUT /imports/1
-  # PATCH/PUT /imports/1.json
   def update
     respond_to do |format|
       if @import.mapping.present? && params[:import][:mapping].blank?
@@ -59,23 +53,19 @@ class ImportsController < ApplicationController
       if @import.update(import_params)
         ImportWorker.perform_async(@import.id) if params[:commit] == "Process Update"
         format.html { redirect_to import_path(@import.uuid), notice: 'Import was successfully updated.' }
-        format.json { render :show, status: :ok, location: @import }
         format.js {  }
       else
         format.html { render :edit }
-        format.json { render json: @import.errors, status: :unprocessable_entity }
         format.js { }
       end
     end
   end
 
   # DELETE /imports/1
-  # DELETE /imports/1.json
   def destroy
     @import.destroy
     respond_to do |format|
       format.html { redirect_to imports_url, notice: 'Import was successfully destroyed.' }
-      format.json { head :no_content }
     end
   end
 
