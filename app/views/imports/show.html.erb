@@ -81,7 +81,7 @@
             $(function() {
                 $('.bhv-blur-save').blur(function() {
                     $(".bhv-submit").val("Process Update");
-                    $(".bhv-submit").trigger('click.rails');
+                    this.form.submit();
                     $(".bhv-submit").val("Process");
                 });
             });
