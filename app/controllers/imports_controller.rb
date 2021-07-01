@@ -57,7 +57,7 @@ class ImportsController < ApplicationController
       end
 
       if @import.update(import_params)
-        ImportWorker.perform_async(@import.id) if params[:commit] == "Process Update"
+        ImportWorker.perform_async(@import.id) if params[:commit] == "Process"
         format.html { redirect_to import_path(@import.uuid), notice: 'Import was successfully updated.' }
         format.json { render :show, status: :ok, location: @import }
         format.js {  }
