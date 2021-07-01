@@ -4,7 +4,7 @@ ruby '2.5.7'
 
 gem 'dotenv-rails', require: 'dotenv/rails-now', groups: [:development, :test]
 
-gem 'rails', '6.0.3.6'
+gem 'rails', '~> 6.0.4'
 
 gem 'pg', '~> 0.21'
 gem 'oj', '~> 2.18.5'
