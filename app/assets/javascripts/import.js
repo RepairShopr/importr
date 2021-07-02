@@ -16,13 +16,7 @@ $(function() {
       console.log("format: "+dateFormat);
       console.log("text: "+$(obj).text());
       $(obj).children("span").text(" > "+ moment($(obj).text(), dateFormat).format());
-
-      //now that we put it in the form, lets send an update so this persists..
-      $(".bhv-submit").val("Process Update");
-      $(".bhv-submit").trigger('click.rails');
-      $(".bhv-submit").val("Process");
     });
-
   });
 
 
