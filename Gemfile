@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.5.7'
+ruby '2.6.8'
 
 gem 'dotenv-rails', require: 'dotenv/rails-now', groups: [:development, :test]
 
